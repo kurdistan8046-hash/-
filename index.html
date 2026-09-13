@@ -1,815 +1,335 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ku">
+<html lang="ku" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>پەروەردە و فێرکردن بۆ منداڵانی کورد</title>
-<style>
-  :root{
-    --red:#ED1C24;
-    --white:#FFFFFF;
-    --green:#007A3D;
-    --yellow:#FFD700;
-    --bg1:#0b1120;
-    --bg2:#101a33;
-    --glass:rgba(255,255,255,0.08);
-    --glass-border:rgba(255,255,255,0.18);
-    --text:#f5f7ff;
-    --muted:#a9b3cc;
-  }
-  *{box-sizing:border-box;}
-  html,body{
-    margin:0;padding:0;height:100%;
-    font-family:'Segoe UI', Tahoma, Geneva, Arial, sans-serif;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(0,122,61,0.25), transparent 40%),
-      radial-gradient(circle at 80% 10%, rgba(237,28,36,0.20), transparent 40%),
-      radial-gradient(circle at 50% 90%, rgba(255,215,0,0.12), transparent 45%),
-      linear-gradient(160deg, var(--bg1), var(--bg2));
-    color:var(--text);
-    overflow-x:hidden;
-    min-height:100%;
-  }
-  #confetti-canvas{
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    pointer-events:none; z-index:9999;
-  }
-  #app{
-    max-width:900px;
-    margin:0 auto;
-    padding:16px;
-    min-height:100vh;
-  }
-  .screen{display:none;}
-  .screen.active{display:block; animation:fadeIn .4s ease;}
-  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>یاری فێربوونی وشە و بیرکاری</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --primary: #278e43; /* Green from flag */
+            --danger: #ed2024; /* Red from flag */
+            --warning: #f9af1b; /* Yellow from flag */
+            --text-main: #333333;
+        }
 
-  .glass{
-    background:var(--glass);
-    backdrop-filter:blur(16px);
-    -webkit-backdrop-filter:blur(16px);
-    border:1px solid var(--glass-border);
-    border-radius:22px;
-    box-shadow:0 8px 32px rgba(0,0,0,0.35);
-  }
+        * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main);
+            text-align: center; 
+            margin: 0; 
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-  /* ===== FLAG ===== */
-  .flag-wrap{display:flex; justify-content:center; margin:10px 0 6px;}
-  .flag{
-    width:150px; height:100px; border-radius:8px; overflow:hidden;
-    display:flex; flex-direction:column; box-shadow:0 6px 20px rgba(0,0,0,0.5);
-    border:1px solid rgba(255,255,255,0.25);
-    position:relative;
-  }
-  .flag .band{flex:1; width:100%;}
-  .flag .band.red{background:var(--red);}
-  .flag .band.white{background:var(--white);}
-  .flag .band.green{background:var(--green);}
-  .flag .sun{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:42px; height:42px;
-  }
+        /* Header & Flag */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
 
-  header.topbar{
-    text-align:center; padding:14px 10px 4px;
-  }
-  header.topbar h1{
-    font-size:1.4rem; margin:4px 0; letter-spacing:0.5px;
-    background:linear-gradient(90deg, var(--yellow), var(--white), var(--green));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  header.topbar p{color:var(--muted); margin:0; font-size:0.85rem;}
+        .flag {
+            width: 50px; height: 33px;
+            display: flex; flex-direction: column;
+            border-radius: 4px; overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .flag .red { background: #ed2024; flex: 1; }
+        .flag .white { background: #ffffff; flex: 1; display: flex; justify-content: center; align-items: center; position: relative;}
+        .flag .white::after { content: '☀️'; position: absolute; font-size: 14px; color: #f9af1b; }
+        .flag .green { background: #278e43; flex: 1; }
 
-  /* ===== PROFILE SCREEN ===== */
-  .profile-card{padding:24px; margin-top:14px;}
-  .profile-list{display:flex; flex-wrap:wrap; gap:12px; margin:16px 0;}
-  .profile-chip{
-    padding:12px 18px; border-radius:16px; cursor:pointer;
-    background:rgba(255,255,255,0.07); border:1px solid var(--glass-border);
-    display:flex; align-items:center; gap:8px; transition:transform .15s, background .15s;
-    font-weight:bold;
-  }
-  .profile-chip:hover{transform:translateY(-3px); background:rgba(255,215,0,0.15);}
-  .profile-chip .avatar{
-    width:34px; height:34px; border-radius:50%;
-    background:conic-gradient(var(--red), var(--yellow), var(--green), var(--white), var(--red));
-    display:flex; align-items:center; justify-content:center; color:#111; font-size:0.9rem;
-  }
-  .profile-chip .del{
-    margin-inline-start:6px; opacity:0.5; font-size:0.8rem; padding:2px 6px; border-radius:8px;
-  }
-  .profile-chip .del:hover{opacity:1; background:rgba(237,28,36,0.4);}
-  .new-profile-row{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;}
-  input[type="text"], input[type="number"]{
-    flex:1; min-width:160px; padding:12px 14px; border-radius:14px; border:1px solid var(--glass-border);
-    background:rgba(255,255,255,0.06); color:var(--text); font-size:1rem; outline:none;
-  }
-  input::placeholder{color:var(--muted);}
+        .stats { font-size: 18px; font-weight: bold; }
+        .stats span { color: var(--primary); margin: 0 5px; }
 
-  button{
-    font-family:inherit; cursor:pointer; border:none; border-radius:14px;
-    padding:12px 20px; font-size:1rem; font-weight:bold;
-    background:linear-gradient(135deg, var(--green), #04502a);
-    color:white; transition:transform .12s, box-shadow .12s, filter .12s;
-    box-shadow:0 4px 14px rgba(0,122,61,0.35);
-  }
-  button:active{transform:scale(0.96);}
-  button:hover{filter:brightness(1.12);}
-  button.secondary{background:linear-gradient(135deg,#3a4568,#232a44); box-shadow:0 4px 14px rgba(0,0,0,0.3);}
-  button.danger{background:linear-gradient(135deg, var(--red), #8f0f14);}
-  button.gold{background:linear-gradient(135deg, var(--yellow), #b98a00); color:#231a00;}
+        /* Game Board */
+        .game-board {
+            background: var(--card-bg);
+            width: 100%; max-width: 600px;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
 
-  /* ===== DASHBOARD ===== */
-  .dash-header{display:flex; justify-content:space-between; align-items:center; padding:16px 20px; margin-top:10px;}
-  .dash-header .who{display:flex; align-items:center; gap:12px;}
-  .dash-avatar{
-    width:52px; height:52px; border-radius:50%;
-    background:conic-gradient(var(--red), var(--yellow), var(--green), var(--white), var(--red));
-    display:flex; align-items:center; justify-content:center; font-weight:bold; color:#111;
-  }
-  .who h2{margin:0; font-size:1.1rem;}
-  .who span{color:var(--muted); font-size:0.8rem;}
-  .switch-btn{font-size:0.75rem; padding:8px 12px;}
+        .mode-toggle {
+            display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
+        }
+        .mode-btn {
+            background: #eee; border: none; padding: 10px 20px;
+            border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold;
+            transition: 0.3s;
+        }
+        .mode-btn.active { background: var(--primary); color: white; }
 
-  .stats-panel{padding:18px 20px; margin-top:12px;}
-  .stat-row{margin-bottom:14px;}
-  .stat-row .label{display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:5px;}
-  .bar-bg{
-    width:100%; height:16px; border-radius:10px; background:rgba(255,255,255,0.08);
-    overflow:hidden; border:1px solid rgba(255,255,255,0.1);
-  }
-  .bar-fill{height:100%; border-radius:10px; transition:width .6s ease;}
-  .bar-noor{background:linear-gradient(90deg,#0aa54c,#00ffa2);}
-  .bar-hikmah{background:linear-gradient(90deg,#1a6fd4,#5fd4ff);}
-  .bar-hez{background:linear-gradient(90deg,#c81420,#ff5c5c);}
+        #display-area {
+            font-size: 100px; 
+            margin: 20px 0; 
+            min-height: 120px;
+            display: flex; justify-content: center; align-items: center;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
 
-  .xp-row{margin-top:6px;}
-  .xp-bar-bg{height:20px; border-radius:12px; background:rgba(255,255,255,0.08); overflow:hidden; position:relative;}
-  .xp-bar-fill{height:100%; background:linear-gradient(90deg,var(--yellow),#fff2a8); transition:width .6s ease;}
-  .xp-text{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#111; font-weight:bold;}
-  .level-badge{
-    display:inline-flex; align-items:center; justify-content:center;
-    background:var(--yellow); color:#231a00; font-weight:bold; border-radius:50%;
-    width:34px; height:34px; font-size:0.9rem; box-shadow:0 0 12px rgba(255,215,0,0.6);
-  }
+        #options { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        
+        .btn { 
+            background-color: var(--primary); 
+            color: white; border: none; 
+            padding: 15px 30px; font-size: 24px; 
+            border-radius: 12px; cursor: pointer; 
+            transition: 0.2s; min-width: 120px;
+            box-shadow: 0 4px 6px rgba(39, 142, 67, 0.3); 
+        }
+        .btn:hover { transform: scale(1.05); }
+        .btn:active { transform: scale(0.95); }
 
-  /* ===== BRANCHES (بەشەکان) ===== */
-  .branch-grid{
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-    gap:14px; padding:18px; margin-top:12px;
-  }
-  .branch-card{
-    padding:20px 10px; text-align:center; cursor:pointer;
-    transition:transform .15s;
-  }
-  .branch-card:hover{transform:translateY(-4px);}
-  .branch-card .icon{font-size:2rem; margin-bottom:6px;}
-  .branch-card h3{margin:4px 0; font-size:1rem;}
-  .branch-card p{margin:0; color:var(--muted); font-size:0.72rem;}
+        #message { font-size: 24px; font-weight: bold; margin-top: 20px; min-height: 35px; }
 
-  /* ===== QUESTION SCREEN ===== */
-  .q-header{display:flex; justify-content:space-between; align-items:center; padding:14px 18px;}
-  .q-header .branch-tag{
-    background:rgba(255,255,255,0.1); padding:6px 14px; border-radius:12px; font-size:0.8rem;
-  }
-  .q-box{padding:26px 22px; margin-top:10px; text-align:center;}
-  .q-box h2{font-size:1.35rem; line-height:1.6; margin:0 0 22px;}
-  .options-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-  .opt-btn{
-    background:rgba(255,255,255,0.07); border:1px solid var(--glass-border); color:var(--text);
-    padding:16px 10px; border-radius:16px; font-size:1rem; box-shadow:none;
-  }
-  .opt-btn:hover{background:rgba(255,215,0,0.15);}
-  .opt-btn.correct{background:linear-gradient(135deg,var(--green),#04502a); border-color:var(--green);}
-  .opt-btn.wrong{background:linear-gradient(135deg,var(--red),#8f0f14); border-color:var(--red);}
+        /* Progress Bar */
+        .progress-container { width: 100%; background: #eee; border-radius: 10px; margin-top: 20px; height: 15px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--warning); width: 0%; transition: width 0.5s ease; }
 
-  .math-input-row{display:flex; gap:10px; justify-content:center; margin-top:10px;}
-  .math-input-row input{max-width:180px; text-align:center; font-size:1.3rem;}
+        /* Animations */
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .shake { animation: shake 0.3s; }
+        .glow { box-shadow: 0 0 20px 10px rgba(39,142,67,0.3) !important; transition: 0.3s; }
 
-  .feedback-box{
-    margin-top:18px; padding:16px 18px; border-radius:16px; font-size:0.95rem; line-height:1.6;
-    display:none;
-  }
-  .feedback-box.show{display:block; animation:fadeIn .3s ease;}
-  .feedback-box.good{background:rgba(0,122,61,0.25); border:1px solid var(--green);}
-  .feedback-box.bad{background:rgba(237,28,36,0.22); border:1px solid var(--red);}
-
-  .shake{animation:shakeAnim .45s;}
-  @keyframes shakeAnim{
-    0%,100%{transform:translateX(0);}
-    20%{transform:translateX(-10px);}
-    40%{transform:translateX(10px);}
-    60%{transform:translateX(-8px);}
-    80%{transform:translateX(8px);}
-  }
-
-  .nav-row{display:flex; justify-content:space-between; padding:14px 18px 30px; gap:10px;}
-  .toast-levelup{
-    position:fixed; top:20px; left:50%; transform:translateX(-50%) scale(0.9);
-    background:linear-gradient(135deg,var(--yellow),#b98a00); color:#231a00; font-weight:bold;
-    padding:16px 28px; border-radius:18px; z-index:10000; box-shadow:0 10px 30px rgba(0,0,0,0.4);
-    opacity:0; transition:all .35s ease; text-align:center; font-size:1.1rem;
-  }
-  .toast-levelup.show{opacity:1; transform:translateX(-50%) scale(1);}
-
-  ::selection{background:var(--yellow); color:#111;}
-  @media(max-width:480px){
-    .options-grid{grid-template-columns:1fr;}
-    header.topbar h1{font-size:1.15rem;}
-  }
-</style>
+        /* Simple Confetti */
+        .confetti { position: absolute; width: 10px; height: 10px; opacity: 0; pointer-events: none; }
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(200px) rotate(360deg); opacity: 0; }
+        }
+    </style>
 </head>
 <body>
-<canvas id="confetti-canvas"></canvas>
-<div id="app">
 
-  <header class="topbar">
-    <div class="flag-wrap">
-      <div class="flag">
-        <div class="band red"></div>
-        <div class="band white"></div>
-        <div class="band green"></div>
-        <svg class="sun" viewBox="0 0 100 100">
-          <g id="sunRays" fill="#FFD700"></g>
-          <circle cx="50" cy="50" r="20" fill="#FFD700" stroke="#b98a00" stroke-width="1"/>
-        </svg>
-      </div>
-    </div>
-    <h1>پەروەردە و فێرکردن</h1>
-    <p>بۆ منداڵانی خۆشەویستی کورد</p>
-  </header>
-
-  <!-- ================= PROFILE SCREEN ================= -->
-  <section id="screen-profile" class="screen active">
-    <div class="glass profile-card">
-      <h2 style="margin-top:0;">📜 هەڵبژاردنی پرۆفایل</h2>
-      <p style="color:var(--muted); margin-top:-6px;">ناوی خۆت بنووسە یان ڕاستەوخۆ دەست پێبکە</p>
-      
-      <div class="profile-list" id="profileList"></div>
-      
-      <div class="new-profile-row">
-        <input type="text" id="newProfileName" placeholder="ناوت لێرە بنووسە..." maxlength="16">
-        <button class="gold" onclick="createProfile()">➕ دروستکردن</button>
-      </div>
-      
-      <div style="margin-top: 20px; text-align: center;">
-        <button class="secondary" onclick="enterAsGuest()" style="width: 100%;">👤 چوونە ژوورەوە بەبێ ناو (منداڵی زیرەک)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= DASHBOARD ================= -->
-  <section id="screen-dashboard" class="screen">
-    <div class="glass dash-header">
-      <div class="who">
-        <div class="dash-avatar" id="dashAvatar">؟</div>
-        <div>
-          <h2 id="dashName">--</h2>
-          <span id="dashLevelText">ئاست 1</span>
+    <!-- Header (Level & Flag) -->
+    <div class="header">
+        <div class="flag">
+            <div class="red"></div><div class="white"></div><div class="green"></div>
         </div>
-      </div>
-      <button class="switch-btn secondary" onclick="logoutProfile()">🔄 گۆڕین</button>
+        <div class="stats">
+            ئاست: <span id="levelDisplay">1</span> | خاڵ: <span id="xpDisplay">0</span>
+        </div>
     </div>
 
-    <div class="glass stats-panel">
-      <div class="xp-row">
-        <div class="label"><span>⭐ ئەزموون (XP)</span><span id="xpLabel">0 / 100</span></div>
-        <div class="xp-bar-bg"><div class="xp-bar-fill" id="xpBar" style="width:0%"></div></div>
-      </div>
-      <br>
-      <div class="stat-row">
-        <div class="label"><span>☪️ پەروەردەی ئاینی (نوور)</span><span id="noorVal">0</span></div>
-        <div class="bar-bg"><div class="bar-fill bar-noor" id="noorBar" style="width:0%"></div></div>
-      </div>
-      <div class="stat-row">
-        <div class="label"><span>🧠 زانست و بیرکاری (حیکمەت)</span><span id="hikmahVal">0</span></div>
-        <div class="bar-bg"><div class="bar-fill bar-hikmah" id="hikmahBar" style="width:0%"></div></div>
-      </div>
-      <div class="stat-row">
-        <div class="label"><span>🛡️ هێزی بەرگری و تێکۆشان</span><span id="hezVal">0</span></div>
-        <div class="bar-bg"><div class="bar-fill bar-hez" id="hezBar" style="width:0%"></div></div>
-      </div>
+    <!-- Main Game Board -->
+    <div class="game-board" id="board">
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="btnReading" onclick="setMode('reading')">📖 فێربوونی وشە</button>
+            <button class="mode-btn" id="btnMath" onclick="setMode('math')">🔢 بیرکاری</button>
+        </div>
+
+        <div id="display-area">🍎</div>
+        <div id="options"></div>
+        <p id="message"></p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="xpBar"></div>
+        </div>
     </div>
 
-    <div class="glass branch-grid">
-      <div class="branch-card glass" onclick="startBranch('islamic')">
-        <div class="icon">☪️</div><h3>پەروەردەی ئیسلامی</h3><p>فیقهـ و ئاکار</p>
-      </div>
-      <div class="branch-card glass" onclick="startBranch('kurdish')">
-        <div class="icon">🦅</div><h3>زمانی کوردی</h3><p>ڕێزمان و وشە</p>
-      </div>
-      <div class="branch-card glass" onclick="startBranch('arabic')">
-        <div class="icon">🕌</div><h3>عەرەبی فوصحە</h3><p>اللغة العربية</p>
-      </div>
-      <div class="branch-card glass" onclick="startBranch('english')">
-        <div class="icon">🌍</div><h3>ئینگلیزی</h3><p>English Language</p>
-      </div>
-      <div class="branch-card glass" onclick="startBranch('math')">
-        <div class="icon">🧮</div><h3>بیرکاری</h3><p>ژمێرکاری و مەتەڵ</p>
-      </div>
-      <div class="branch-card glass" onclick="startBranch('science')">
-        <div class="icon">🔬</div><h3>زانستە گشتییەکان</h3><p>ژینگە و گەردوون</p>
-      </div>
-    </div>
-  </section>
+    <script>
+        // داتابەیسی وشەکان (دەتوانیت زیاتری بکەیت)
+        const dictionary = [
+            { emoji: '🍎', word: 'سێو' }, { emoji: '🍌', word: 'مۆز' }, { emoji: '🍇', word: 'ترێ' },
+            { emoji: '🍉', word: 'شوتی' }, { emoji: '🍓', word: 'شلیک' }, { emoji: '🐈', word: 'پشیلە' },
+            { emoji: '🐕', word: 'سەگ' }, { emoji: '🐓', word: 'مریشک' }, { emoji: '🐄', word: 'مانگا' },
+            { emoji: '🏠', word: 'ماڵ' }, { emoji: '🚪', word: 'دەرگا' }, { emoji: '🪟', word: 'پەنجەرە' },
+            { emoji: '☀️', word: 'خۆر' }, { emoji: '🌙', word: 'مانگ' }, { emoji: '⭐', word: 'ئەستێرە' },
+            { emoji: '🌳', word: 'درەخت' }, { emoji: '🚗', word: 'ئۆتۆمبێل' }, { emoji: '✈️', word: 'فڕۆکە' }
+        ];
 
-  <!-- ================= QUESTION SCREEN ================= -->
-  <section id="screen-question" class="screen">
-    <div class="glass q-header">
-      <span class="branch-tag" id="qBranchTag">--</span>
-      <span class="level-badge" id="qLevelBadge">1</span>
-    </div>
-    <div class="glass q-box" id="qBoxWrapper">
-      <h2 id="qText">...</h2>
-      <div class="options-grid" id="optionsGrid"></div>
-      <div class="math-input-row" id="mathInputRow" style="display:none;">
-        <input type="number" id="mathAnswerInput" placeholder="وەڵام">
-        <button class="gold" onclick="submitMathAnswer()">✅ پشتڕاستکردنەوە</button>
-      </div>
-      <div class="feedback-box" id="feedbackBox"></div>
-    </div>
-    <div class="nav-row">
-      <button class="secondary" onclick="goDashboard()">⬅ گەڕانەوە</button>
-      <button class="gold" id="nextQBtn" style="display:none;" onclick="loadQuestion()">پرسیاری داهاتوو ➡</button>
-    </div>
-  </section>
+        // گۆڕاوەکان
+        let currentMode = 'reading';
+        let level = parseInt(localStorage.getItem('kurdGameLevel')) || 1;
+        let xp = parseInt(localStorage.getItem('kurdGameXP')) || 0;
+        let xpNeeded = level * 50;
+        let currentAnswer = '';
 
-</div>
+        // نوێکردنەوەی شاشە
+        function updateUI() {
+            document.getElementById('levelDisplay').innerText = level;
+            document.getElementById('xpDisplay').innerText = xp;
+            let xpPercent = (xp / xpNeeded) * 100;
+            document.getElementById('xpBar').style.width = xpPercent + '%';
+        }
 
-<div class="toast-levelup" id="levelToast"></div>
+        // سەیڤکردنی داتاکان
+        function saveData() {
+            localStorage.setItem('kurdGameLevel', level);
+            localStorage.setItem('kurdGameXP', xp);
+            xpNeeded = level * 50;
+            updateUI();
+        }
 
-<script>
-/* =========================================================
-   CORE ENGINE - FIXED & ERROR PROOFED
-   ========================================================= */
+        // گۆڕینی مۆد
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btnReading').classList.remove('active');
+            document.getElementById('btnMath').classList.remove('active');
+            if(mode === 'reading') document.getElementById('btnReading').classList.add('active');
+            if(mode === 'math') document.getElementById('btnMath').classList.add('active');
+            document.getElementById('message').innerText = '';
+            loadQuestion();
+        }
 
-(function drawSun(){
-  try {
-    const g = document.getElementById('sunRays');
-    const rays = 21, cx=50, cy=50, rInner=20, rOuter=30;
-    let html = '';
-    for(let i=0;i<rays;i++){
-      const angle = (i/rays)*2*Math.PI;
-      const x1 = cx + rInner*Math.cos(angle);
-      const y1 = cy + rInner*Math.sin(angle);
-      const x2 = cx + rOuter*Math.cos(angle + (Math.PI/rays));
-      const y2 = cy + rOuter*Math.sin(angle + (Math.PI/rays));
-      const x3 = cx + rInner*Math.cos(angle + (2*Math.PI/rays));
-      const y3 = cy + rInner*Math.sin(angle + (2*Math.PI/rays));
-      html += `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3}"/>`;
-    }
-    if(g) g.innerHTML = html;
-  } catch(e){}
-})();
+        // تێکەڵکردنی وەڵامەکان هەڕەمەکی
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
+        // دروستکردنی پرسیار
+        function loadQuestion() {
+            const display = document.getElementById('display-area');
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            display.style.fontSize = '100px';
 
-/* ---------- CONFETTI ---------- */
-const FLAG_COLORS = ['#ED1C24','#FFFFFF','#007A3D','#FFD700'];
-let canvas, ctx, particles = [];
-try {
-  canvas = document.getElementById('confetti-canvas');
-  ctx = canvas.getContext('2d');
-  window.addEventListener('resize', resizeCanvas); 
-  resizeCanvas();
-  animateConfetti();
-} catch(e){}
+            let options = [];
 
-function resizeCanvas(){ 
-  try{ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }catch(e){}
-}
-function launchConfetti(amount=80){
-  try {
-    for(let i=0;i<amount;i++){
-      particles.push({
-        x: Math.random()*canvas.width,
-        y: -20 - Math.random()*100,
-        vx: (Math.random()-0.5)*4,
-        vy: 2+Math.random()*4,
-        size: 5+Math.random()*6,
-        color: FLAG_COLORS[Math.floor(Math.random()*FLAG_COLORS.length)],
-        rot: Math.random()*360,
-        vr: (Math.random()-0.5)*10,
-        life: 0
-      });
-    }
-  } catch(e){}
-}
-function animateConfetti(){
-  try {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(p=>{
-      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life++;
-      ctx.save();
-      ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
-      ctx.fillStyle=p.color;
-      ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
-      ctx.restore();
-    });
-    particles = particles.filter(p=> p.y < canvas.height+30 && p.life < 400);
-    requestAnimationFrame(animateConfetti);
-  } catch(e){}
-}
+            if (currentMode === 'reading') {
+                // مۆدی فێربوونی وشەکان
+                let correctItem = dictionary[Math.floor(Math.random() * dictionary.length)];
+                currentAnswer = correctItem.word;
+                display.innerText = correctItem.emoji;
 
-/* ---------- LOCALSTORAGE DB ---------- */
-const DB_KEY = 'KOL_USERS_DB_V4'; // Changed version to clear old broken data
-let memoryDB = {};
+                options.push(correctItem.word);
+                while(options.length < 3) {
+                    let randomItem = dictionary[Math.floor(Math.random() * dictionary.length)].word;
+                    if(!options.includes(randomItem)) options.push(randomItem);
+                }
+            } else {
+                // مۆدی بیرکاری (پێشکەوتوو بەپێی ئاست)
+                display.style.fontSize = '80px';
+                let num1, num2, sign;
+                
+                if (level <= 3) { // کۆکردنەوەی سادە
+                    num1 = Math.floor(Math.random() * 5) + 1;
+                    num2 = Math.floor(Math.random() * 5) + 1;
+                    sign = '+';
+                    currentAnswer = (num1 + num2).toString();
+                } else if (level <= 6) { // کۆکردنەوەی گەورەتر
+                    num1 = Math.floor(Math.random() * 10) + 5;
+                    num2 = Math.floor(Math.random() * 10) + 1;
+                    sign = '+';
+                    currentAnswer = (num1 + num2).toString();
+                } else { // لێدەرکردن
+                    num1 = Math.floor(Math.random() * 15) + 10;
+                    num2 = Math.floor(Math.random() * 10) + 1;
+                    sign = '-';
+                    currentAnswer = (num1 - num2).toString();
+                }
 
-function loadDB(){
-  try{ 
-    const data = localStorage.getItem(DB_KEY);
-    if(data) {
-        const parsed = JSON.parse(data);
-        return (typeof parsed === 'object' && parsed !== null) ? parsed : {};
-    }
-  }catch(e){ 
-    console.error("DB Load Error:", e);
-  }
-  return {};
-}
+                display.innerText = `${num1} ${sign} ${num2}`;
+                
+                options.push(currentAnswer);
+                while(options.length < 3) {
+                    let wrongAnswer = parseInt(currentAnswer) + (Math.floor(Math.random() * 5) * (Math.random() > 0.5 ? 1 : -1)) + 1;
+                    if(!options.includes(wrongAnswer.toString()) && wrongAnswer >= 0) options.push(wrongAnswer.toString());
+                }
+            }
 
-function saveDB(db){ 
-  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(e){} 
-}
+            // پیشاندانی دوگمەکان
+            options = shuffleArray(options);
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, btn);
+                optionsDiv.appendChild(btn);
+            });
+        }
 
-function defaultUser(name){
-  return { name, level:1, xp:0, noor:0, hikmah:0, hez:0, created:Date.now() };
-}
+        // پشکنینی وەڵام
+        function checkAnswer(selected, btnElement) {
+            const msg = document.getElementById('message');
+            const board = document.getElementById('board');
+            
+            // ڕێگری لە داگرتنی خێرا
+            const allBtns = document.querySelectorAll('.btn');
+            allBtns.forEach(b => b.disabled = true);
 
-let CURRENT_USER = null;
+            if (selected === currentAnswer) {
+                // وەڵامی ڕاست
+                msg.innerText = 'ئافەرین پاڵەوان! 👏';
+                msg.style.color = 'var(--primary)';
+                board.classList.add('glow');
+                btnElement.style.backgroundColor = '#1e7b36'; // تۆختر
+                
+                createConfetti(); // ئاهەنگگێڕان بە ڕەنگەکانی ئاڵای کوردستان
 
-function showScreen(id){
-  try {
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  } catch(e){}
-}
+                xp += 15;
+                if (xp >= xpNeeded) {
+                    level++;
+                    xp = 0;
+                    msg.innerText = `ئافەرین! چوویتە ئاستی ${level} 🎉`;
+                }
+                saveData();
 
-function renderProfileList(){
-  try {
-    const db = loadDB();
-    const list = document.getElementById('profileList');
-    list.innerHTML = '';
-    const names = Object.keys(db);
-    if(names.length===0){
-      list.innerHTML = '<p style="color:var(--muted); width:100%; text-align:center;">هێشتا هیچ پرۆفایلێک نییە.</p>';
-      return;
-    }
-    names.forEach(name=>{
-      const u = db[name];
-      const chip = document.createElement('div');
-      chip.className='profile-chip';
-      chip.innerHTML = `<div class="avatar">${name.charAt(0).toUpperCase()}</div>
-        <span>${name} (ئاست ${u.level})</span>
-        <span class="del" onclick="event.stopPropagation(); deleteProfile('${name.replace(/'/g,"")}')">🗑</span>`;
-      chip.onclick = ()=> selectProfile(name);
-      list.appendChild(chip);
-    });
-  } catch(e){}
-}
+                setTimeout(() => { 
+                    board.classList.remove('glow');
+                    msg.innerText = ''; 
+                    loadQuestion(); 
+                }, 1500);
 
-function createProfile(){
-  try {
-    const input = document.getElementById('newProfileName');
-    const name = input.value.trim();
-    if(!name){ 
-        input.focus(); 
-        alert("تکایە سەرەتا ناوێک بنووسە!");
-        return; 
-    }
-    const db = loadDB();
-    if(!db[name]) {
-        db[name] = defaultUser(name);
-        saveDB(db);
-    }
-    input.value='';
-    selectProfile(name);
-  } catch(e) {
-    alert("کێشەیەک ڕووی دا، تکایە دووبارە هەوڵ بدەوە.");
-  }
-}
+            } else {
+                // وەڵامی هەڵە
+                msg.innerText = 'نەخێر، هەڵەیە. دووبارە هەوڵ بدەرەوە!';
+                msg.style.color = 'var(--danger)';
+                board.classList.add('shake');
+                btnElement.style.backgroundColor = 'var(--danger)';
+                
+                setTimeout(() => { 
+                    board.classList.remove('shake'); 
+                    msg.innerText = '';
+                    btnElement.style.backgroundColor = 'var(--primary)';
+                    allBtns.forEach(b => b.disabled = false);
+                }, 1000);
+            }
+        }
 
-function enterAsGuest() {
-    const guestName = "منداڵی زیرەک";
-    const db = loadDB();
-    if(!db[guestName]) {
-        db[guestName] = defaultUser(guestName);
-        saveDB(db);
-    }
-    selectProfile(guestName);
-}
+        // دروستکردنی پەڕەی ئاهەنگ (بە ڕەنگەکانی ئاڵای کوردستان)
+        function createConfetti() {
+            const board = document.getElementById('board');
+            const colors = ['#ed2024', '#278e43', '#f9af1b', '#ffffff']; // سور، سەوز، زەرد، سپی
+            
+            for (let i = 0; i < 20; i++) {
+                let conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.top = '10%';
+                conf.style.animation = `fall ${Math.random() * 1 + 1}s linear`;
+                board.appendChild(conf);
+                
+                setTimeout(() => { conf.remove(); }, 2000);
+            }
+        }
 
-function deleteProfile(name){
-  const db = loadDB();
-  delete db[name];
-  saveDB(db);
-  renderProfileList();
-}
-
-function selectProfile(name){
-  try {
-    const db = loadDB();
-    CURRENT_USER = db[name] || defaultUser(name);
-    db[name] = CURRENT_USER;
-    saveDB(db);
-    showScreen('screen-dashboard');
-    renderDashboard();
-  } catch(e){}
-}
-
-function logoutProfile(){
-  CURRENT_USER = null;
-  showScreen('screen-profile');
-  renderProfileList();
-}
-
-function persistUser(){
-  const db = loadDB();
-  db[CURRENT_USER.name] = CURRENT_USER;
-  saveDB(db);
-}
-
-function xpNeeded(level){ return level*100; }
-function renderDashboard(){
-  try {
-    document.getElementById('dashName').textContent = CURRENT_USER.name;
-    document.getElementById('dashAvatar').textContent = CURRENT_USER.name.charAt(0).toUpperCase();
-    document.getElementById('dashLevelText').textContent = `ئاست ${CURRENT_USER.level}`;
-    const need = xpNeeded(CURRENT_USER.level);
-    document.getElementById('xpLabel').textContent = `${CURRENT_USER.xp} / ${need}`;
-    document.getElementById('xpBar').style.width = Math.min(100,(CURRENT_USER.xp/need)*100)+'%';
-
-    const capStat = 100;
-    document.getElementById('noorVal').textContent = CURRENT_USER.noor;
-    document.getElementById('hikmahVal').textContent = CURRENT_USER.hikmah;
-    document.getElementById('hezVal').textContent = CURRENT_USER.hez;
-    document.getElementById('noorBar').style.width = Math.min(100, (CURRENT_USER.noor/capStat)*100)+'%';
-    document.getElementById('hikmahBar').style.width = Math.min(100, (CURRENT_USER.hikmah/capStat)*100)+'%';
-    document.getElementById('hezBar').style.width = Math.min(100, (CURRENT_USER.hez/capStat)*100)+'%';
-  } catch(e){}
-}
-function goDashboard(){ showScreen('screen-dashboard'); renderDashboard(); }
-
-function difficultyTier(level){
-  if(level<=3) return 1;
-  if(level<=6) return 2;
-  return 3;
-}
-
-/* =========================================================
-   QUESTION BANKS (پەروەردەی ئاینی، زمانەکان و زانست)
-   ========================================================= */
-const BANK = {
-  islamic: [
-    {d:1,q:"پێغەمبەرمان ناوی چییە (د.خ)؟", o:["مستەفا کوڕی عەبدوڵڵا","حەزرەتی محەممەد (ﷺ)","حەزرەتی عیسا (ع)","حەزرەتی موسا (ع)"], c:1},
-    {d:1,q:"چەند ستوون هەیە لە ئیسلامدا (ڕوکنەکانی ئیسلام)؟", o:["پێنج ستوون","چوار ستوون","شەش ستوون","سێ ستوون"], c:0},
-    {d:1,q:"یەکەم سورەتی پیرۆزی قورئانی مەزن کامەیە؟", o:["سورەتی الإخلاص","سورەتی الفاتحة","سورەتی الناس","سورەتی البقرة"], c:1},
-    {d:1,q:"خودای گەورە لە چەند ڕۆژدا ئاسمانەکان و زەوی دروست کرد؟", o:["لە شەش ڕۆژدا","لە حەوت ڕۆژدا","لە سێ ڕۆژدا","لە یەک ڕۆژدا"], c:0},
-    {d:2,q:"نوێژە فەرزەکانی ڕۆژ و شەو چەند دانەن؟", o:["پێنج نوێژ","چوار نوێژ","شەش نوێژ","سێ نوێژ"], c:0},
-    {d:2,q:"ناوی دایکی پێغەمبەرەکەمان (ﷺ) چی بوو؟", o:["خەدیجە","ئامینەی کچی وەهەب","فاتیحە","عائیشە"], c:1},
-    {d:2,q:"کامیان لەمانە ڕەوشتی جوانە و پێغەمبەر (ﷺ) فەرموویەتی؟", o:["ڕاستگۆیی و دەستپاکی","درۆکردن","غەیبەتکردن","تەمبەڵی"], c:0},
-    {d:3,q:"کام لەمانە یەکێکە لە په‌یوەندییە گرنگەکانی موسڵمان لەگەڵ دایک و باوکیدا؟", o:["چاکەکاربوون و ڕێزگرتنیان","گوێنەدانیان","تووڕەبوون لێیان","پەیوەندینەکردن"], c:0},
-    {d:3,q:"مانگی ڕەمەزان مانگی چییە لە ئیسلامدا؟", o:["مانگی ڕۆژووگرتن و قورئان","مانگی گەشتکردن","مانگی یاری کردن","مانگی خەوتن"], c:0}
-  ],
-  kurdish: [
-    {d:1,q:"پێچەوانەی وشەی 'گەورە' چییە؟", o:["بچووک","بەرز","دوور","خۆش"], c:0},
-    {d:1,q:"کۆی وشەی 'کتێب' کامەیە؟", o:["کتێبەکان","کتێبیش","کتێبدا","کتێبەوە"], c:0},
-    {d:1,q:"وشەی 'خۆر' واتای چییە بە ئینگلیزی؟", o:["Moon","Sun","Star","Sky"], c:1},
-    {d:2,q:"کامیان لەمانە هاوواتای 'ئازایی'یە؟", o:["ترس","دلێری","تەمبەڵی","خەم"], c:1},
-    {d:2,q:"کامیان ناوی ئامرازێکی نووسین و خوێندنە؟", o:["پەنکە","پێنووس","تەلەفزیۆن","سەیارە"], c:1},
-    {d:3,q:"کام لەمانە پیتی بزوێنە لە زمانی کوردییدا؟", o:["ب","و (درێژ)","ت","س"], c:1}
-  ],
-  arabic: [
-    {d:1,q:"ما معنى كلمة 'الشمس' بالعربية والكردية؟", o:["مانگ","خۆر","ئەستێرە","ئاسمان"], c:1},
-    {d:1,q:"ما معنى عبارة 'الحمد لله'؟", o:["سوپاس بۆ خودا","ببورە","بەخێربێی","خوا حافیز"], c:0},
-    {d:1,q:"ما هو جمع كلمة 'كتاب'؟", o:["كتب","كاتب","مكتب","كتابان"], c:0},
-    {d:2,q:"ما معنى كلمة 'العلم'؟", o:["زانیاری و زانست","خەو","یاری","تەمبەڵی"], c:0},
-    {d:2,q:"ما معنى 'الصبر' في الأخلاق الإسلامية؟", o:["خۆگرتن و ئارامگرتن","تووڕەیی","پەلەکردن","ترس"], c:0}
-  ],
-  english: [
-    {d:1,q:"What does the word 'Sun' mean in Kurdish?", o:["مانگ","خۆر","ئەستێرە","ئاو"], c:1},
-    {d:1,q:"What is the meaning of 'Book'?", o:["کتێب","کورسی","پەنجەرە","کاغەز"], c:0},
-    {d:1,q:"What does 'Happy' mean?", o:["خەمگین","خۆشحاڵ","ماندوو","تووڕە"], c:1},
-    {d:2,q:"What is the meaning of 'Knowledge'?", o:["زانیاری","نەزانی","یاری","خەو"], c:0},
-    {d:2,q:"What does 'Strong' mean?", o:["لاواز","بەهێز","بچووک","کز"], c:1}
-  ],
-  science: [
-    {d:1,q:"دڵ لە لەشی مرۆڤدا چ کارێک دەکات؟", o:["خوێن دەگوازێتەوە بۆ هەموو لەش","بیرکردنەوە","هەناسەدان","هەرسکردنی خۆراک"], c:0},
-    {d:1,q:"مرۆڤ بە چی هەناسە دەدات لە سیستەمی هەناسەداندا؟", o:["سییەکان (سیفکەکان)","دڵ","گورچیلەکان","مێشک"], c:0},
-    {d:2,q:"دار و ڕوەکەکان بە چ پرۆسەیەک ئۆکسجین دروست دەکەن؟", o:["ڕۆشنەپێکهاتن","خواردنی گۆشت","خەوتن","ساردبوونەوە"], c:0},
-    {d:2,q:"زەوی بە دەوری چیدا دەسووڕێتەوە بۆ دروستکردنی ساڵ؟", o:["بە دەوری خۆردا","بە دەوری مانگدا","بە دەوری خۆیدا تەنها","بە دەوری ئەستێرەکاندا"], c:0},
-    {d:3,q:"کام لەمانە سەرچاوەی سەرەکی وزە و ڕووناکییە لە کۆمەڵەی خۆردا؟", o:["خۆر","مانگ","زەوی","مەریخ"], c:0}
-  ]
-};
-
-function generateMathQuestion(level){
-  let a,b,op,question,answer;
-  if(level<=3){
-    a = Math.floor(Math.random()* (10+level*3)) + 1;
-    b = Math.floor(Math.random()* (10+level*3)) + 1;
-    op = Math.random()<0.5 ? '+' : '-';
-    if(op==='-' && b>a){ [a,b]=[b,a]; }
-    answer = op==='+' ? a+b : a-b;
-    question = `${a} ${op} ${b} = ?`;
-  } else if(level<=6){
-    a = Math.floor(Math.random()*12)+2;
-    b = Math.floor(Math.random()*12)+2;
-    op = Math.random()<0.5 ? '×' : '÷';
-    if(op==='×'){ answer = a*b; question = `${a} × ${b} = ?`; }
-    else { const product=a*b; question = `${product} ÷ ${a} = ?`; answer = b; }
-  } else {
-    a = Math.floor(Math.random()*15)+2;
-    b = Math.floor(Math.random()*15)+2;
-    const c = Math.floor(Math.random()*10)+1;
-    answer = (a*b)+c; 
-    question = `(${a} × ${b}) + ${c} = ?`;
-  }
-  return {question, answer};
-}
-
-/* =========================================================
-   PRAISE & RESILIENCE ENGINE
-   ========================================================= */
-const PRAISE_NOOR = [
-  "ماشاللە {name}! تۆ زانیاری ئاینی و ڕۆحی جوانت نیشان دا 🌟",
-  "{name}، دڵت پڕ بوو لە نوور و تێگەیشتنی ڕاست!",
-  "پیرۆزە {name}، زانیارییە ئاینییەکانت زۆر بەنرخن."
-];
-const PRAISE_HIKMAH = [
-  "ئافەرین {name}! مێشکت وەک تیغ تیژە و وەڵامەکەت ڕاستە.",
-  "{name}، تۆ زانایەکی وردبین و سەرکەوتووی!",
-  "دەستخۆش {name}، حیکمەت و زانستت گەشە دەکات."
-];
-const PRAISE_GENERIC = [
-  "دەستخۆشی گەورە {name}! هەر بەردەوام بە.",
-  "تۆ نموونەی منداڵی زیرەك و پەروەردەکراوی {name}!"
-];
-function pickPraise(branch){
-  if(branch==='islamic' || branch==='arabic') return rand(PRAISE_NOOR);
-  return rand(PRAISE_HIKMAH);
-}
-
-const RESILIENCE_QUOTES = [
-  "قبوڵکردنی هەڵە بنەمای فێربوونە {name}. دووبارە هەوڵ بدەوە، تۆ دەتوانیت!",
-  "ئارامی و بەرگری نیشانەی کەسایەتی بەهێزە {name}. سەرکەوتن لە پشت هەوڵەوەیە.",
-  "پێغەمبەر (ﷺ) فەرموویەتی بڕواداری بەهێز باشترە {name}. تێكۆشە و کۆڵ مەدە!",
-  "هەر هەڵەیەک وانەیەکی نوێیە بۆ زیرەکتربوونت {name}. پێشکەش بە هێزی دەروونت!",
-  "مێشکت مەزنە {name}، تەنها پێویستە سەرنجت بخەیتە سەر وەڵامە ڕاستەکە."
-];
-function pickResilience(){ return rand(RESILIENCE_QUOTES); }
-function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function fillName(str){ return str.replace(/\{name\}/g, CURRENT_USER.name); }
-
-function statKeyForBranch(branch){
-  if(branch==='islamic' || branch==='arabic') return 'noor';
-  return 'hikmah';
-}
-
-function grantCorrect(branch, difficulty){
-  const gainXP = 8 * difficulty;
-  const gainStat = 5 * difficulty;
-  CURRENT_USER.xp += gainXP;
-  CURRENT_USER[statKeyForBranch(branch)] = Math.min(999, CURRENT_USER[statKeyForBranch(branch)] + gainStat);
-  checkLevelUp();
-  persistUser();
-  renderDashboard();
-}
-function grantWrong(){
-  CURRENT_USER.xp = Math.max(0, CURRENT_USER.xp - 2);
-  CURRENT_USER.hez = Math.min(999, CURRENT_USER.hez + 4); 
-  persistUser();
-  renderDashboard();
-}
-function checkLevelUp(){
-  const need = xpNeeded(CURRENT_USER.level);
-  if(CURRENT_USER.xp >= need){
-    CURRENT_USER.xp -= need;
-    CURRENT_USER.level += 1;
-    showLevelUpToast();
-    launchConfetti(140);
-  }
-}
-function showLevelUpToast(){
-  const toast = document.getElementById('levelToast');
-  toast.textContent = `🎉 ${CURRENT_USER.name} پیرۆزە! گەیشتیتە ئاستی ${CURRENT_USER.level} 🎉`;
-  toast.classList.add('show');
-  setTimeout(()=> toast.classList.remove('show'), 2600);
-}
-
-let CURRENT_BRANCH = null;
-let CURRENT_Q = null;
-
-const BRANCH_LABELS = {
-  islamic:"پەروەردەی ئاینی ئیسلامی",
-  kurdish:"زمانی کوردی", 
-  arabic:"عەرەبی فوصحە", 
-  english:"زمانی ئینگلیزی",
-  math:"بیرکاری", 
-  science:"زانستە گشتییەکان"
-};
-
-function startBranch(branch){
-  CURRENT_BRANCH = branch;
-  showScreen('screen-question');
-  document.getElementById('qBranchTag').textContent = BRANCH_LABELS[branch];
-  document.getElementById('qLevelBadge').textContent = CURRENT_USER.level;
-  loadQuestion();
-}
-
-function shuffle(arr){
-  const a=[...arr];
-  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
-  return a;
-}
-
-function loadQuestion(){
-  try {
-    document.getElementById('nextQBtn').style.display='none';
-    document.getElementById('feedbackBox').className='feedback-box';
-    document.getElementById('feedbackBox').textContent='';
-    document.getElementById('qLevelBadge').textContent = CURRENT_USER.level;
-
-    const optionsGrid = document.getElementById('optionsGrid');
-    const mathRow = document.getElementById('mathInputRow');
-    optionsGrid.innerHTML=''; optionsGrid.style.display='grid';
-    mathRow.style.display='none';
-
-    if(CURRENT_BRANCH==='math'){
-      mathRow.style.display='flex';
-      optionsGrid.style.display='none';
-      const mq = generateMathQuestion(CURRENT_USER.level);
-      CURRENT_Q = { answer: mq.answer, difficulty: difficultyTier(CURRENT_USER.level) };
-      document.getElementById('qText').textContent = mq.question;
-      document.getElementById('mathAnswerInput').value='';
-      document.getElementById('mathAnswerInput').focus();
-    } else {
-      const tier = difficultyTier(CURRENT_USER.level);
-      let pool = BANK[CURRENT_BRANCH].filter(q=>q.d===tier);
-      if(pool.length===0) pool = BANK[CURRENT_BRANCH];
-      const picked = pool[Math.floor(Math.random()*pool.length)];
-      CURRENT_Q = { correctIndex: picked.c, difficulty: picked.d, options: picked.o };
-      document.getElementById('qText').textContent = picked.q;
-
-      const order = shuffle(picked.o.map((text,idx)=>({text,idx})));
-      order.forEach(opt=>{
-        const btn = document.createElement('button');
-        btn.className='opt-btn';
-        btn.textContent = opt.text;
-        btn.onclick = ()=> submitChoice(opt.idx, btn);
-        optionsGrid.appendChild(btn);
-      });
-    }
-  } catch(e){}
-}
-
-function submitChoice(selectedIdx, btnEl){
-  const allBtns = document.querySelectorAll('.opt-btn');
-  allBtns.forEach(b=> b.disabled=true);
-  const isCorrect = selectedIdx === CURRENT_Q.correctIndex;
-  if(isCorrect){
-    btnEl.classList.add('correct');
-  } else {
-    btnEl.classList.add('wrong');
-    allBtns.forEach(b=>{ if(b.textContent === CURRENT_Q.options[CURRENT_Q.correctIndex]) b.classList.add('correct'); });
-  }
-  handleResult(isCorrect, CURRENT_Q.difficulty);
-}
-
-function submitMathAnswer(){
-  const val = parseFloat(document.getElementById('mathAnswerInput').value);
-  if(isNaN(val)) return;
-  const isCorrect = val === CURRENT_Q.answer;
-  handleResult(isCorrect, CURRENT_Q.difficulty);
-}
-
-function handleResult(isCorrect, difficulty){
-  const box = document.getElementById('feedbackBox');
-  const wrapper = document.getElementById('qBoxWrapper');
-  if(isCorrect){
-    launchConfetti(40);
-    grantCorrect(CURRENT_BRANCH, difficulty);
-    box.className = 'feedback-box good show';
-    box.textContent = fillName(pickPraise(CURRENT_BRANCH));
-  } else {
-    wrapper.classList.remove('shake'); void wrapper.offsetWidth; wrapper.classList.add('shake');
-    grantWrong();
-    box.className = 'feedback-box bad show';
-    box.textContent = fillName(pickResilience());
-  }
-  document.getElementById('nextQBtn').style.display='inline-block';
-}
-
-try {
-  document.getElementById('newProfileName').addEventListener('keypress', e=>{
-    if(e.key==='Enter') createProfile();
-  });
-  const mathInp = document.getElementById('mathAnswerInput');
-  if(mathInp){
-    mathInp.addEventListener('keypress', e=>{
-      if(e.key==='Enter') submitMathAnswer();
-    });
-  }
-  renderProfileList();
-} catch(e){}
-</script>
+        // دەستپێکردن
+        updateUI();
+        loadQuestion();
+    </script>
 </body>
 </html>
