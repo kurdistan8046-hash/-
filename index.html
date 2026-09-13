@@ -2,576 +2,537 @@
 <html dir="rtl" lang="ku">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>یاری فێربوون - وەرزشی مێشک</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>پاشایەتیی نوور | Kingdom of Light</title>
 <style>
   :root{
-    --red:#ed2024;
-    --white:#ffffff;
-    --green:#278e43;
-    --yellow:#f9af1b;
-    --ink:#2b2440;
-    --paper:#fbf5e9;
-    --card:#ffffff;
-    --teal:#1e8a86;
-    --coral:#e8663f;
-    --mustard:#d99b1a;
-    --plum:#7a4a9c;
-    --shadow: 0 10px 26px rgba(43,36,64,0.14);
+    --red:#ED1C24;
+    --white:#FFFFFF;
+    --green:#007A3D;
+    --yellow:#FFD700;
+    --bg1:#0b1120;
+    --bg2:#101a33;
+    --glass:rgba(255,255,255,0.08);
+    --glass-border:rgba(255,255,255,0.18);
+    --text:#f5f7ff;
+    --muted:#a9b3cc;
   }
   *{box-sizing:border-box;}
   html,body{
-    margin:0;padding:0;
-    min-height:100%;
+    margin:0;padding:0;height:100%;
+    font-family:'Segoe UI', Tahoma, Geneva, Arial, sans-serif;
     background:
-      radial-gradient(circle at 15% 10%, rgba(249,175,27,0.18), transparent 40%),
-      radial-gradient(circle at 85% 85%, rgba(30,138,134,0.14), transparent 45%),
-      var(--paper);
-    font-family: "Segoe UI", Tahoma, "Noto Sans Arabic", Geneva, Verdana, sans-serif;
-    color:var(--ink);
+      radial-gradient(circle at 20% 20%, rgba(0,122,61,0.25), transparent 40%),
+      radial-gradient(circle at 80% 10%, rgba(237,28,36,0.20), transparent 40%),
+      radial-gradient(circle at 50% 90%, rgba(255,215,0,0.12), transparent 45%),
+      linear-gradient(160deg, var(--bg1), var(--bg2));
+    color:var(--text);
     overflow-x:hidden;
+    min-height:100%;
   }
-  .wrap{
-    max-width:640px;
+  #confetti-canvas{
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    pointer-events:none; z-index:9999;
+  }
+  #app{
+    max-width:900px;
     margin:0 auto;
-    padding:14px 16px 40px;
+    padding:16px;
+    min-height:100vh;
   }
+  .screen{display:none;}
+  .screen.active{display:block; animation:fadeIn .4s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
 
-  /* ---------- HEADER ---------- */
-  header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    background:var(--card);
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border);
     border-radius:22px;
-    padding:12px 16px;
-    box-shadow:var(--shadow);
-    margin-bottom:14px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.35);
   }
+
+  /* ===== FLAG ===== */
+  .flag-wrap{display:flex; justify-content:center; margin:10px 0 6px;}
   .flag{
-    width:64px;
-    height:44px;
-    border-radius:8px;
-    overflow:hidden;
-    flex:none;
-    box-shadow:0 2px 6px rgba(0,0,0,0.18);
+    width:150px; height:100px; border-radius:8px; overflow:hidden;
+    display:flex; flex-direction:column; box-shadow:0 6px 20px rgba(0,0,0,0.5);
+    border:1px solid rgba(255,255,255,0.25);
     position:relative;
-    border:1px solid rgba(0,0,0,0.06);
   }
-  .flag .stripe{width:100%;height:33.33%;}
-  .flag .stripe.top{background:var(--red);}
-  .flag .stripe.mid{background:var(--white);position:relative;}
-  .flag .stripe.bot{background:var(--green);}
-  .sun{
-    position:absolute;
-    top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    width:24px;height:24px;
-    border-radius:50%;
-    background:repeating-conic-gradient(var(--yellow) 0deg 8.57deg, transparent 8.57deg 17.14deg);
+  .flag .band{flex:1; width:100%;}
+  .flag .band.red{background:var(--red);}
+  .flag .band.white{background:var(--white);}
+  .flag .band.green{background:var(--green);}
+  .flag .sun{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:42px; height:42px;
   }
-  .sun::after{
-    content:"";
-    position:absolute;
-    inset:5px;
-    border-radius:50%;
-    background:var(--white);
-  }
-  .title-block{flex:1;min-width:0;}
-  .title-block h1{
-    margin:0;
-    font-size:1.18rem;
-    line-height:1.3;
-  }
-  .title-block p{
-    margin:2px 0 0;
-    font-size:0.8rem;
-    color:#6b6280;
-  }
-  .reset-btn{
-    flex:none;
-    background:none;
-    border:1.5px solid #e3ddce;
-    color:#8a8298;
-    border-radius:12px;
-    padding:8px 10px;
-    font-size:0.72rem;
-    cursor:pointer;
-    line-height:1.2;
-  }
-  .reset-btn:hover{border-color:var(--coral);color:var(--coral);}
 
-  /* ---------- PROGRESS ---------- */
-  .progress-card{
-    background:var(--card);
-    border-radius:18px;
-    padding:12px 16px;
-    box-shadow:var(--shadow);
-    margin-bottom:14px;
-    display:flex;
-    align-items:center;
-    gap:12px;
+  header.topbar{
+    text-align:center; padding:14px 10px 4px;
   }
+  header.topbar h1{
+    font-size:1.4rem; margin:4px 0; letter-spacing:0.5px;
+    background:linear-gradient(90deg, var(--yellow), var(--white), var(--green));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  header.topbar p{color:var(--muted); margin:0; font-size:0.85rem;}
+
+  /* ===== PROFILE SCREEN ===== */
+  .profile-card{padding:24px; margin-top:14px;}
+  .profile-list{display:flex; flex-wrap:wrap; gap:12px; margin:16px 0;}
+  .profile-chip{
+    padding:12px 18px; border-radius:16px; cursor:pointer;
+    background:rgba(255,255,255,0.07); border:1px solid var(--glass-border);
+    display:flex; align-items:center; gap:8px; transition:transform .15s, background .15s;
+    font-weight:bold;
+  }
+  .profile-chip:hover{transform:translateY(-3px); background:rgba(255,215,0,0.15);}
+  .profile-chip .avatar{
+    width:34px; height:34px; border-radius:50%;
+    background:conic-gradient(var(--red), var(--yellow), var(--green), var(--white), var(--red));
+    display:flex; align-items:center; justify-content:center; color:#111; font-size:0.9rem;
+  }
+  .profile-chip .del{
+    margin-inline-start:6px; opacity:0.5; font-size:0.8rem; padding:2px 6px; border-radius:8px;
+  }
+  .profile-chip .del:hover{opacity:1; background:rgba(237,28,36,0.4);}
+  .new-profile-row{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;}
+  input[type="text"], input[type="number"]{
+    flex:1; min-width:160px; padding:12px 14px; border-radius:14px; border:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.06); color:var(--text); font-size:1rem; outline:none;
+  }
+  input::placeholder{color:var(--muted);}
+
+  button{
+    font-family:inherit; cursor:pointer; border:none; border-radius:14px;
+    padding:12px 20px; font-size:1rem; font-weight:bold;
+    background:linear-gradient(135deg, var(--green), #04502a);
+    color:white; transition:transform .12s, box-shadow .12s, filter .12s;
+    box-shadow:0 4px 14px rgba(0,122,61,0.35);
+  }
+  button:active{transform:scale(0.96);}
+  button:hover{filter:brightness(1.12);}
+  button.secondary{background:linear-gradient(135deg,#3a4568,#232a44); box-shadow:0 4px 14px rgba(0,0,0,0.3);}
+  button.danger{background:linear-gradient(135deg, var(--red), #8f0f14);}
+  button.gold{background:linear-gradient(135deg, var(--yellow), #b98a00); color:#231a00;}
+
+  /* ===== DASHBOARD ===== */
+  .dash-header{display:flex; justify-content:space-between; align-items:center; padding:16px 20px; margin-top:10px;}
+  .dash-header .who{display:flex; align-items:center; gap:12px;}
+  .dash-avatar{
+    width:52px; height:52px; border-radius:50%;
+    background:conic-gradient(var(--red), var(--yellow), var(--green), var(--white), var(--red));
+    display:flex; align-items:center; justify-content:center; font-weight:bold; color:#111;
+  }
+  .who h2{margin:0; font-size:1.1rem;}
+  .who span{color:var(--muted); font-size:0.8rem;}
+  .switch-btn{font-size:0.75rem; padding:8px 12px;}
+
+  .stats-panel{padding:18px 20px; margin-top:12px;}
+  .stat-row{margin-bottom:14px;}
+  .stat-row .label{display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:5px;}
+  .bar-bg{
+    width:100%; height:16px; border-radius:10px; background:rgba(255,255,255,0.08);
+    overflow:hidden; border:1px solid rgba(255,255,255,0.1);
+  }
+  .bar-fill{height:100%; border-radius:10px; transition:width .6s ease;}
+  .bar-noor{background:linear-gradient(90deg,#0aa54c,#00ffa2);}
+  .bar-hikmah{background:linear-gradient(90deg,#1a6fd4,#5fd4ff);}
+  .bar-hez{background:linear-gradient(90deg,#c81420,#ff5c5c);}
+
+  .xp-row{margin-top:6px;}
+  .xp-bar-bg{height:20px; border-radius:12px; background:rgba(255,255,255,0.08); overflow:hidden; position:relative;}
+  .xp-bar-fill{height:100%; background:linear-gradient(90deg,var(--yellow),#fff2a8); transition:width .6s ease;}
+  .xp-text{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#111; font-weight:bold;}
   .level-badge{
-    flex:none;
-    width:46px;height:46px;
-    border-radius:50%;
-    background:linear-gradient(145deg,var(--teal),#166663);
-    color:#fff;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    font-weight:700;
-    font-size:0.95rem;
-    line-height:1;
-  }
-  .level-badge small{font-size:0.55rem;font-weight:500;opacity:0.85;margin-bottom:2px;}
-  .xp-area{flex:1;}
-  .xp-label{font-size:0.72rem;color:#8a8298;margin-bottom:4px;display:flex;justify-content:space-between;}
-  .xp-bar{
-    height:12px;
-    background:#eee5d1;
-    border-radius:8px;
-    overflow:hidden;
-  }
-  .xp-fill{
-    height:100%;
-    background:linear-gradient(90deg,var(--yellow),var(--coral));
-    border-radius:8px;
-    transition:width 0.5s ease;
-    width:0%;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:var(--yellow); color:#231a00; font-weight:bold; border-radius:50%;
+    width:34px; height:34px; font-size:0.9rem; box-shadow:0 0 12px rgba(255,215,0,0.6);
   }
 
-  /* ---------- MODE SWITCH ---------- */
-  .modes{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-bottom:16px;
+  /* ===== BRANCHES ===== */
+  .branch-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:14px; padding:18px; margin-top:12px;
   }
-  .mode-btn{
-    border:none;
-    border-radius:16px;
-    padding:13px 10px;
-    font-size:0.95rem;
-    font-weight:700;
-    cursor:pointer;
-    background:#efe8d8;
-    color:#8a8298;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  .branch-card{
+    padding:20px 10px; text-align:center; cursor:pointer;
+    transition:transform .15s;
   }
-  .mode-btn span.ic{font-size:1.2rem;}
-  .mode-btn.active{
-    background:linear-gradient(145deg,var(--teal),#166663);
-    color:#fff;
-    box-shadow:0 8px 18px rgba(30,138,134,0.35);
-    transform:translateY(-1px);
-  }
-  .mode-btn:not(.active):hover{background:#e6ddc6;}
+  .branch-card:hover{transform:translateY(-4px);}
+  .branch-card .icon{font-size:2rem; margin-bottom:6px;}
+  .branch-card h3{margin:4px 0; font-size:1rem;}
+  .branch-card p{margin:0; color:var(--muted); font-size:0.72rem;}
 
-  /* ---------- GAME CARD ---------- */
-  .game-card{
-    background:var(--card);
-    border-radius:24px;
-    padding:26px 20px 22px;
-    box-shadow:var(--shadow);
-    text-align:center;
-    position:relative;
-    overflow:hidden;
+  /* ===== QUESTION SCREEN ===== */
+  .q-header{display:flex; justify-content:space-between; align-items:center; padding:14px 18px;}
+  .q-header .branch-tag{
+    background:rgba(255,255,255,0.1); padding:6px 14px; border-radius:12px; font-size:0.8rem;
   }
-  .prompt{
-    font-size:4.6rem;
-    line-height:1;
-    margin-bottom:6px;
-    user-select:none;
+  .q-box{padding:26px 22px; margin-top:10px; text-align:center;}
+  .q-box h2{font-size:1.35rem; line-height:1.6; margin:0 0 22px;}
+  .options-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .opt-btn{
+    background:rgba(255,255,255,0.07); border:1px solid var(--glass-border); color:var(--text);
+    padding:16px 10px; border-radius:16px; font-size:1rem; box-shadow:none;
   }
-  .prompt.equation{
-    font-size:2.5rem;
-    font-weight:800;
-    direction:ltr;
-    color:var(--ink);
-    letter-spacing:1px;
-  }
-  .sub-hint{
-    font-size:0.82rem;
-    color:#a89fb5;
-    margin-bottom:20px;
-  }
-  .choices{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-  }
-  .choice-btn{
-    border:none;
-    border-radius:16px;
-    padding:16px 8px;
-    font-size:1.15rem;
-    font-weight:700;
-    color:#fff;
-    cursor:pointer;
-    box-shadow:0 6px 0 rgba(0,0,0,0.12);
-    transition:transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
-  }
-  .choice-btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,0.12);}
-  .choice-btn.c0{background:var(--teal);}
-  .choice-btn.c1{background:var(--coral);}
-  .choice-btn.c2{background:var(--mustard);}
-  .choice-btn.c3{background:var(--plum);}
-  .choice-btn.correct-flash{
-    background:var(--green) !important;
-    box-shadow:0 0 0 4px rgba(39,142,67,0.35);
-  }
-  .choice-btn.wrong-flash{
-    background:var(--red) !important;
-    box-shadow:0 0 0 4px rgba(237,32,36,0.3);
-  }
-  .choice-btn[disabled]{cursor:default;filter:grayscale(0.15);}
+  .opt-btn:hover{background:rgba(255,215,0,0.15);}
+  .opt-btn.correct{background:linear-gradient(135deg,var(--green),#04502a); border-color:var(--green);}
+  .opt-btn.wrong{background:linear-gradient(135deg,var(--red),#8f0f14); border-color:var(--red);}
 
-  .feedback{
-    min-height:34px;
-    margin-top:16px;
-    font-size:1.15rem;
-    font-weight:800;
-  }
-  .feedback.good{color:var(--green);}
-  .feedback.bad{color:var(--red);}
+  .math-input-row{display:flex; gap:10px; justify-content:center; margin-top:10px;}
+  .math-input-row input{max-width:180px; text-align:center; font-size:1.3rem;}
 
-  .shake{animation:shakeAnim 0.4s ease;}
+  .feedback-box{
+    margin-top:18px; padding:16px 18px; border-radius:16px; font-size:0.95rem; line-height:1.6;
+    display:none;
+  }
+  .feedback-box.show{display:block; animation:fadeIn .3s ease;}
+  .feedback-box.good{background:rgba(0,122,61,0.25); border:1px solid var(--green);}
+  .feedback-box.bad{background:rgba(237,28,36,0.22); border:1px solid var(--red);}
+
+  .shake{animation:shakeAnim .45s;}
   @keyframes shakeAnim{
-    10%,90%{transform:translateX(-3px);}
-    20%,80%{transform:translateX(6px);}
-    30%,50%,70%{transform:translateX(-10px);}
-    40%,60%{transform:translateX(10px);}
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-10px);}
+    40%{transform:translateX(10px);}
+    60%{transform:translateX(-8px);}
+    80%{transform:translateX(8px);}
   }
 
-  .glow-pulse{animation:glowPulse 0.6s ease;}
-  @keyframes glowPulse{
-    0%{box-shadow:0 0 0 0 rgba(39,142,67,0.5);}
-    70%{box-shadow:0 0 0 22px rgba(39,142,67,0);}
-    100%{box-shadow:0 0 0 0 rgba(39,142,67,0);}
+  .nav-row{display:flex; justify-content:space-between; padding:14px 18px 30px; gap:10px;}
+  .toast-levelup{
+    position:fixed; top:20px; left:50%; transform:translateX(-50%) scale(0.9);
+    background:linear-gradient(135deg,var(--yellow),#b98a00); color:#231a00; font-weight:bold;
+    padding:16px 28px; border-radius:18px; z-index:10000; box-shadow:0 10px 30px rgba(0,0,0,0.4);
+    opacity:0; transition:all .35s ease; text-align:center; font-size:1.1rem;
   }
+  .toast-levelup.show{opacity:1; transform:translateX(-50%) scale(1);}
 
-  /* confetti */
-  .confetti-piece{
-    position:fixed;
-    top:-10px;
-    width:9px;height:14px;
-    z-index:999;
-    pointer-events:none;
-    border-radius:2px;
-    animation:confettiFall linear forwards;
-  }
-  @keyframes confettiFall{
-    to{ transform:translateY(110vh) rotate(540deg); opacity:0.85; }
-  }
-
-  footer{
-    text-align:center;
-    font-size:0.7rem;
-    color:#a89fb5;
-    margin-top:18px;
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .shake, .glow-pulse, .confetti-piece{animation:none !important;}
+  ::selection{background:var(--yellow); color:#111;}
+  @media(max-width:480px){
+    .options-grid{grid-template-columns:1fr;}
+    header.topbar h1{font-size:1.15rem;}
   }
 </style>
 </head>
 <body>
-<div class="wrap">
+<canvas id="confetti-canvas"></canvas>
+<div id="app">
 
-  <header>
-    <div class="flag">
-      <div class="stripe top"></div>
-      <div class="stripe mid"><div class="sun"></div></div>
-      <div class="stripe bot"></div>
+  <header class="topbar">
+    <div class="flag-wrap">
+      <div class="flag">
+        <div class="band red"></div>
+        <div class="band white"></div>
+        <div class="band green"></div>
+        <svg class="sun" viewBox="0 0 100 100">
+          <g id="sunRays" fill="#FFD700"></g>
+          <circle cx="50" cy="50" r="20" fill="#FFD700" stroke="#b98a00" stroke-width="1"/>
+        </svg>
+      </div>
     </div>
-    <div class="title-block">
-      <h1>یاری فێربوون</h1>
-      <p>خوێندنەوە و بیرکاری بۆ منداڵان</p>
-    </div>
-    <button class="reset-btn" id="resetBtn" title="بۆ دایک و باوکان: پێشکەوتن ڕیسێت بکە">ڕیسێت</button>
+    <h1>پاشایەتیی نوور</h1>
+    <p>گەشتی زانین، ئیمان و هێزی مێشک</p>
   </header>
 
-  <div class="progress-card">
-    <div class="level-badge">
-      <small>ئاست</small>
-      <span id="levelDisplay">1</span>
-    </div>
-    <div class="xp-area">
-      <div class="xp-label">
-        <span>خاڵی زیرەکی</span>
-        <span id="xpText">0 / 50</span>
+  <!-- ================= PROFILE SCREEN ================= -->
+  <section id="screen-profile" class="screen active">
+    <div class="glass profile-card">
+      <h2 style="margin-top:0;">📜 هەڵبژاردنی پرۆفایل</h2>
+      <p style="color:var(--muted); margin-top:-6px;">ناوی خۆت هەڵبژێرە یان پرۆفایلێکی نوێ دروست بکە</p>
+      <div class="profile-list" id="profileList"></div>
+      <div class="new-profile-row">
+        <input type="text" id="newProfileName" placeholder="ناوی نوێ بنووسە...(New name)" maxlength="16">
+        <button class="gold" onclick="createProfile()">➕ دروستکردنی پاشا/شاژن</button>
       </div>
-      <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
     </div>
-  </div>
+  </section>
 
-  <div class="modes">
-    <button class="mode-btn active" id="readBtn"><span class="ic">📖</span> خوێندنەوە</button>
-    <button class="mode-btn" id="mathBtn"><span class="ic">➕</span> بیرکاری</button>
-  </div>
+  <!-- ================= DASHBOARD ================= -->
+  <section id="screen-dashboard" class="screen">
+    <div class="glass dash-header">
+      <div class="who">
+        <div class="dash-avatar" id="dashAvatar">؟</div>
+        <div>
+          <h2 id="dashName">--</h2>
+          <span id="dashLevelText">ئاست 1</span>
+        </div>
+      </div>
+      <button class="switch-btn secondary" onclick="logoutProfile()">🔄 گۆڕینی پرۆفایل</button>
+    </div>
 
-  <div class="game-card" id="gameCard">
-    <div class="prompt" id="promptEl">🐱</div>
-    <div class="sub-hint" id="hintEl">وشەی ڕاست هەڵبژێرە</div>
-    <div class="choices" id="choicesEl"></div>
-    <div class="feedback" id="feedbackEl"></div>
-  </div>
+    <div class="glass stats-panel">
+      <div class="xp-row">
+        <div class="label"><span>⭐ ئەزموون (XP)</span><span id="xpLabel">0 / 100</span></div>
+        <div class="xp-bar-bg"><div class="xp-bar-fill" id="xpBar" style="width:0%"></div></div>
+      </div>
+      <br>
+      <div class="stat-row">
+        <div class="label"><span>🟢 نوور (ڕۆح)</span><span id="noorVal">0</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-noor" id="noorBar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-row">
+        <div class="label"><span>🔵 حیکمەت (زانیاری)</span><span id="hikmahVal">0</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-hikmah" id="hikmahBar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-row">
+        <div class="label"><span>🔴 هێز (بەرگری دەروونی)</span><span id="hezVal">0</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-hez" id="hezBar" style="width:0%"></div></div>
+      </div>
+    </div>
 
-  <footer>دروستکراوە بۆ منداڵانی کورد 🌿</footer>
+    <div class="glass branch-grid">
+      <div class="branch-card glass" onclick="startBranch('kurdish')">
+        <div class="icon">🦅</div><h3>زمانی کوردی</h3><p>وشە و ڕێزمان</p>
+      </div>
+      <div class="branch-card glass" onclick="startBranch('arabic')">
+        <div class="icon">🕌</div><h3>عەرەبی فوصحە</h3><p>وشەی قورئانی</p>
+      </div>
+      <div class="branch-card glass" onclick="startBranch('english')">
+        <div class="icon">🌍</div><h3>ئینگلیزی</h3><p>English Words</p>
+      </div>
+      <div class="branch-card glass" onclick="startBranch('math')">
+        <div class="icon">🧮</div><h3>بیرکاری</h3><p>ژمارە و مەسەلە</p>
+      </div>
+      <div class="branch-card glass" onclick="startBranch('science')">
+        <div class="icon">🔬</div><h3>زانست و ئیمان</h3><p>سروشت و بەدیهێنراو</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= QUESTION SCREEN ================= -->
+  <section id="screen-question" class="screen">
+    <div class="glass q-header">
+      <span class="branch-tag" id="qBranchTag">--</span>
+      <span class="level-badge" id="qLevelBadge">1</span>
+    </div>
+    <div class="glass q-box" id="qBoxWrapper">
+      <h2 id="qText">...</h2>
+      <div class="options-grid" id="optionsGrid"></div>
+      <div class="math-input-row" id="mathInputRow" style="display:none;">
+        <input type="number" id="mathAnswerInput" placeholder="وەڵام">
+        <button class="gold" onclick="submitMathAnswer()">✅ پشتڕاستکردنەوە</button>
+      </div>
+      <div class="feedback-box" id="feedbackBox"></div>
+    </div>
+    <div class="nav-row">
+      <button class="secondary" onclick="goDashboard()">⬅ گەڕانەوە بۆ ماڵپەڕ</button>
+      <button class="gold" id="nextQBtn" style="display:none;" onclick="loadQuestion()">پرسیاری داهاتوو ➡</button>
+    </div>
+  </section>
+
 </div>
 
+<div class="toast-levelup" id="levelToast"></div>
+
 <script>
-(function(){
-  "use strict";
+/* =========================================================
+   KINGDOM OF LIGHT — CORE ENGINE
+   ========================================================= */
 
-  /* ---------------- DATA ---------------- */
-  var WORDS = [
-    {w:"پشیله", e:"🐱"}, {w:"سەگ", e:"🐶"}, {w:"ئەسپ", e:"🐴"}, {w:"مانگا", e:"🐄"},
-    {w:"بەرخ", e:"🐑"}, {w:"مریشک", e:"🐔"}, {w:"باڵندە", e:"🐦"}, {w:"ماسی", e:"🐟"},
-    {w:"شێر", e:"🦁"}, {w:"فیل", e:"🐘"}, {w:"کەروێشک", e:"🐰"}, {w:"ورچ", e:"🐻"},
-    {w:"مار", e:"🐍"}, {w:"بەقە", e:"🐸"}, {w:"گورگ", e:"🐺"},
-    {w:"نان", e:"🍞"}, {w:"برنج", e:"🍚"}, {w:"گۆشت", e:"🍖"}, {w:"سێو", e:"🍎"},
-    {w:"پرتەقاڵ", e:"🍊"}, {w:"مۆز", e:"🍌"}, {w:"هەنگوین", e:"🍯"}, {w:"شیر", e:"🥛"},
-    {w:"هێلکە", e:"🥚"}, {w:"پەنیر", e:"🧀"}, {w:"چای", e:"🍵"}, {w:"کیک", e:"🎂"},
-    {w:"خەیار", e:"🥒"}, {w:"تەماتە", e:"🍅"}, {w:"ترێ", e:"🍇"},
-    {w:"ماڵ", e:"🏠"}, {w:"دەرگا", e:"🚪"}, {w:"پەنجەرە", e:"🪟"}, {w:"کورسی", e:"🪑"},
-    {w:"جێگا", e:"🛏️"}, {w:"چرا", e:"💡"}, {w:"کلیل", e:"🔑"}, {w:"کتێب", e:"📖"},
-    {w:"تۆپ", e:"⚽"}, {w:"تەلەفزیۆن", e:"📺"},
-    {w:"خۆر", e:"☀️"}, {w:"مانگ", e:"🌙"}, {w:"ئەستێرە", e:"⭐"}, {w:"دار", e:"🌳"},
-    {w:"گوڵ", e:"🌸"}, {w:"باران", e:"🌧️"}, {w:"بەفر", e:"❄️"}, {w:"شاخ", e:"⛰️"},
-    {w:"دەریا", e:"🌊"}, {w:"هەور", e:"☁️"},
-    {w:"سوور", e:"🔴"}, {w:"سپی", e:"⚪"}, {w:"شین", e:"🔵"}, {w:"زەرد", e:"🟡"},
-    {w:"سەوز", e:"🟢"}, {w:"ڕەش", e:"⚫"}
-  ];
-
-  var PRAISE = ["ئافەرین!", "تۆ زۆر زیرەکی!", "مامۆستای گەورەی!", "کارێکی نایابت کرد!", "وا بەردەوامبە!"];
-  var TRY_AGAIN = ["هەوڵبدەرەوە!", "نزیک بوویت، دووبارە هەوڵبدە!", "خۆت مەڕەنجێنە، هەوڵبدەرەوە!"];
-
-  var FLAG_COLORS = ["#ed2024", "#ffffff", "#278e43", "#f9af1b"];
-
-  /* ---------------- STATE ---------------- */
-  var STORAGE_LEVEL = "kurdishGame_level";
-  var STORAGE_XP = "kurdishGame_xp";
-
-  var state = {
-    mode: "read",
-    level: parseInt(localStorage.getItem(STORAGE_LEVEL) || "1", 10),
-    xp: parseInt(localStorage.getItem(STORAGE_XP) || "0", 10),
-    locked: false,
-    current: null
-  };
-
-  /* ---------------- DOM ---------------- */
-  var promptEl = document.getElementById("promptEl");
-  var hintEl = document.getElementById("hintEl");
-  var choicesEl = document.getElementById("choicesEl");
-  var feedbackEl = document.getElementById("feedbackEl");
-  var gameCard = document.getElementById("gameCard");
-  var levelDisplay = document.getElementById("levelDisplay");
-  var xpText = document.getElementById("xpText");
-  var xpFill = document.getElementById("xpFill");
-  var readBtn = document.getElementById("readBtn");
-  var mathBtn = document.getElementById("mathBtn");
-  var resetBtn = document.getElementById("resetBtn");
-
-  function xpNeeded(level){ return 50 + (level - 1) * 15; }
-
-  function saveProgress(){
-    localStorage.setItem(STORAGE_LEVEL, String(state.level));
-    localStorage.setItem(STORAGE_XP, String(state.xp));
+/* ---------- SUN RAYS (SVG generation) ---------- */
+(function drawSun(){
+  const g = document.getElementById('sunRays');
+  const rays = 21, cx=50, cy=50, rInner=20, rOuter=30;
+  let html = '';
+  for(let i=0;i<rays;i++){
+    const angle = (i/rays)*2*Math.PI;
+    const nextAngle = angle + (Math.PI/rays)*0.5;
+    const x1 = cx + rInner*Math.cos(angle);
+    const y1 = cy + rInner*Math.sin(angle);
+    const x2 = cx + rOuter*Math.cos(angle + (Math.PI/rays));
+    const y2 = cy + rOuter*Math.sin(angle + (Math.PI/rays));
+    const x3 = cx + rInner*Math.cos(angle + (2*Math.PI/rays));
+    const y3 = cy + rInner*Math.sin(angle + (2*Math.PI/rays));
+    html += `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3}"/>`;
   }
+  g.innerHTML = html;
+})();
 
-  function renderProgress(){
-    levelDisplay.textContent = state.level;
-    var need = xpNeeded(state.level);
-    xpText.textContent = state.xp + " / " + need;
-    var pct = Math.min(100, (state.xp / need) * 100);
-    xpFill.style.width = pct + "%";
-  }
+/* ---------- AUDIO ENGINE (Web Audio API) ---------- */
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } if(audioCtx.state==='suspended'){audioCtx.resume();} }
+function tone(freq, start, dur, type='sine', vol=0.18){
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime+start);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+start+dur);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(audioCtx.currentTime+start);
+  osc.stop(audioCtx.currentTime+start+dur+0.05);
+}
+function sfxClick(){ ensureAudio(); tone(600,0,0.06,'triangle',0.12); }
+function sfxSuccess(){ ensureAudio(); tone(523.25,0,0.12,'sine'); tone(659.25,0.1,0.12,'sine'); tone(783.99,0.2,0.2,'sine'); }
+function sfxError(){ ensureAudio(); tone(200,0,0.18,'sawtooth',0.15); tone(140,0.12,0.25,'sawtooth',0.15); }
+function sfxLevelUp(){ ensureAudio();
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=> tone(f, i*0.12, 0.25,'triangle',0.16));
+}
 
-  function addXP(amount){
-    state.xp += amount;
-    var need = xpNeeded(state.level);
-    if (state.xp >= need){
-      state.xp -= need;
-      state.level += 1;
-    }
-    saveProgress();
-    renderProgress();
-  }
-
-  /* ---------------- SHUFFLE HELPERS ---------------- */
-  function shuffle(arr){
-    var a = arr.slice();
-    for (var i = a.length - 1; i > 0; i--){
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
-    }
-    return a;
-  }
-  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
-
-  /* ---------------- READING MODE ---------------- */
-  function nextReadingQuestion(){
-    var pool = shuffle(WORDS);
-    var correct = pool[0];
-    var wrongs = pool.slice(1, 4);
-    var options = shuffle([correct].concat(wrongs));
-
-    state.current = { type: "read", answer: correct.w };
-
-    promptEl.classList.remove("equation");
-    promptEl.style.fontSize = "";
-    promptEl.textContent = correct.e;
-    hintEl.textContent = "ئەم وێنەیە بە کوردی چی ناوی دێت؟";
-
-    renderChoices(options.map(function(o){ return o.w; }));
-  }
-
-  /* ---------------- MATH MODE ---------------- */
-  function generateMathProblem(level){
-    var a, b, op, answer, text;
-    if (level <= 3){
-      a = randInt(1, 8);
-      b = randInt(1, 9 - a);
-      op = "+";
-      answer = a + b;
-    } else if (level <= 6){
-      a = randInt(1, 18);
-      b = randInt(1, 20 - a);
-      op = "+";
-      answer = a + b;
-    } else {
-      op = Math.random() < 0.5 ? "+" : "-";
-      if (op === "+"){
-        a = randInt(1, 18);
-        b = randInt(1, 20 - a);
-        answer = a + b;
-      } else {
-        a = randInt(1, 20);
-        b = randInt(0, a);
-        answer = a - b;
-      }
-    }
-    text = a + " " + op + " " + b + " = ؟";
-    return { text: text, answer: answer };
-  }
-
-  function nextMathQuestion(){
-    var problem = generateMathProblem(state.level);
-    state.current = { type: "math", answer: problem.answer };
-
-    promptEl.classList.add("equation");
-    promptEl.textContent = problem.text;
-    hintEl.textContent = "وەڵامی ڕاست هەڵبژێرە";
-
-    var answers = new Set([problem.answer]);
-    while (answers.size < 4){
-      var delta = randInt(-5, 5);
-      var candidate = problem.answer + delta;
-      if (candidate >= 0 && candidate !== problem.answer) answers.add(candidate);
-    }
-    var options = shuffle(Array.from(answers));
-    renderChoices(options.map(function(n){ return String(n); }));
-  }
-
-  /* ---------------- RENDER CHOICES ---------------- */
-  function renderChoices(labels){
-    choicesEl.innerHTML = "";
-    feedbackEl.textContent = "";
-    feedbackEl.className = "feedback";
-    state.locked = false;
-
-    labels.forEach(function(label, i){
-      var btn = document.createElement("button");
-      btn.className = "choice-btn c" + i;
-      btn.textContent = label;
-      btn.addEventListener("click", function(){ handleAnswer(btn, label); });
-      choicesEl.appendChild(btn);
+/* ---------- CONFETTI (Flag colors ONLY) ---------- */
+const FLAG_COLORS = ['#ED1C24','#FFFFFF','#007A3D','#FFD700'];
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
+let particles = [];
+function launchConfetti(amount=80){
+  for(let i=0;i<amount;i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: -20 - Math.random()*100,
+      vx: (Math.random()-0.5)*4,
+      vy: 2+Math.random()*4,
+      size: 5+Math.random()*6,
+      color: FLAG_COLORS[Math.floor(Math.random()*FLAG_COLORS.length)],
+      rot: Math.random()*360,
+      vr: (Math.random()-0.5)*10,
+      life: 0
     });
   }
-
-  function handleAnswer(btn, label){
-    if (state.locked) return;
-    state.locked = true;
-
-    var correctAnswer = String(state.current.answer);
-    var isCorrect = (label === correctAnswer);
-
-    var allBtns = choicesEl.querySelectorAll(".choice-btn");
-    allBtns.forEach(function(b){ b.disabled = true; });
-
-    if (isCorrect){
-      btn.classList.add("correct-flash", "glow-pulse");
-      feedbackEl.textContent = PRAISE[randInt(0, PRAISE.length - 1)];
-      feedbackEl.classList.add("good");
-      addXP(10);
-      launchConfetti();
-    } else {
-      btn.classList.add("wrong-flash");
-      gameCard.classList.add("shake");
-      feedbackEl.textContent = TRY_AGAIN[randInt(0, TRY_AGAIN.length - 1)];
-      feedbackEl.classList.add("bad");
-      allBtns.forEach(function(b){
-        if (b.textContent === correctAnswer) b.classList.add("correct-flash");
-      });
-    }
-
-    setTimeout(function(){
-      gameCard.classList.remove("shake");
-      if (state.mode === "read") nextReadingQuestion(); else nextMathQuestion();
-    }, 1100);
-  }
-
-  /* ---------------- CONFETTI (flag colors only) ---------------- */
-  function launchConfetti(){
-    var count = 26;
-    for (var i = 0; i < count; i++){
-      var piece = document.createElement("div");
-      piece.className = "confetti-piece";
-      piece.style.left = randInt(2, 98) + "vw";
-      piece.style.background = FLAG_COLORS[randInt(0, FLAG_COLORS.length - 1)];
-      var duration = (1.1 + Math.random() * 0.9).toFixed(2);
-      piece.style.animationDuration = duration + "s";
-      piece.style.opacity = "0.95";
-      document.body.appendChild(piece);
-      (function(el){
-        setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 2200);
-      })(piece);
-    }
-  }
-
-  /* ---------------- MODE SWITCH ---------------- */
-  function setMode(mode){
-    state.mode = mode;
-    readBtn.classList.toggle("active", mode === "read");
-    mathBtn.classList.toggle("active", mode === "math");
-    if (mode === "read") nextReadingQuestion(); else nextMathQuestion();
-  }
-
-  readBtn.addEventListener("click", function(){ setMode("read"); });
-  mathBtn.addEventListener("click", function(){ setMode("math"); });
-
-  resetBtn.addEventListener("click", function(){
-    var ok = window.confirm("دڵنیایت لە ڕیسێتکردنی هەموو پێشکەوتن؟ (بۆ دایک و باوکان)");
-    if (!ok) return;
-    state.level = 1;
-    state.xp = 0;
-    saveProgress();
-    renderProgress();
-    if (state.mode === "read") nextReadingQuestion(); else nextMathQuestion();
+}
+function animateConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life++;
+    ctx.save();
+    ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle=p.color;
+    ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+    ctx.restore();
   });
+  particles = particles.filter(p=> p.y < canvas.height+30 && p.life < 400);
+  requestAnimationFrame(animateConfetti);
+}
+animateConfetti();
 
-  /* ---------------- INIT ---------------- */
-  renderProgress();
-  nextReadingQuestion();
+/* ---------- LOCALSTORAGE MULTI-USER DB ---------- */
+const DB_KEY = 'KOL_USERS_DB_V1';
+function loadDB(){
+  try{ return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }catch(e){ return {}; }
+}
+function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 
-})();
-</script>
-</body>
-</html>
+function defaultUser(name){
+  return { name, level:1, xp:0, noor:0, hikmah:0, hez:0, created:Date.now() };
+}
+
+let CURRENT_USER = null;
+
+/* ---------- SCREEN MANAGEMENT ---------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ---------- PROFILE SCREEN LOGIC ---------- */
+function renderProfileList(){
+  const db = loadDB();
+  const list = document.getElementById('profileList');
+  list.innerHTML = '';
+  const names = Object.keys(db);
+  if(names.length===0){
+    list.innerHTML = '<p style="color:var(--muted)">هێشتا هیچ پرۆفایلێک نییە. یەکەم پاشا/شاژن دروست بکە!</p>';
+    return;
+  }
+  names.forEach(name=>{
+    const u = db[name];
+    const chip = document.createElement('div');
+    chip.className='profile-chip';
+    chip.innerHTML = `<div class="avatar">${name.charAt(0).toUpperCase()}</div>
+      <span>${name} (ئاست ${u.level})</span>
+      <span class="del" onclick="event.stopPropagation(); deleteProfile('${name.replace(/'/g,"")}')">🗑</span>`;
+    chip.onclick = ()=> selectProfile(name);
+    list.appendChild(chip);
+  });
+}
+function createProfile(){
+  sfxClick();
+  const input = document.getElementById('newProfileName');
+  const name = input.value.trim();
+  if(!name){ input.focus(); return; }
+  const db = loadDB();
+  if(!db[name]) db[name] = defaultUser(name);
+  saveDB(db);
+  input.value='';
+  selectProfile(name);
+}
+function deleteProfile(name){
+  sfxClick();
+  const db = loadDB();
+  delete db[name];
+  saveDB(db);
+  renderProfileList();
+}
+function selectProfile(name){
+  sfxClick();
+  const db = loadDB();
+  CURRENT_USER = db[name] || defaultUser(name);
+  db[name] = CURRENT_USER;
+  saveDB(db);
+  showScreen('screen-dashboard');
+  renderDashboard();
+}
+function logoutProfile(){
+  sfxClick();
+  CURRENT_USER = null;
+  showScreen('screen-profile');
+  renderProfileList();
+}
+function persistUser(){
+  const db = loadDB();
+  db[CURRENT_USER.name] = CURRENT_USER;
+  saveDB(db);
+}
+
+/* ---------- DASHBOARD RENDER ---------- */
+function xpNeeded(level){ return level*100; }
+function renderDashboard(){
+  document.getElementById('dashName').textContent = CURRENT_USER.name;
+  document.getElementById('dashAvatar').textContent = CURRENT_USER.name.charAt(0).toUpperCase();
+  document.getElementById('dashLevelText').textContent = `ئاست ${CURRENT_USER.level}`;
+  const need = xpNeeded(CURRENT_USER.level);
+  document.getElementById('xpLabel').textContent = `${CURRENT_USER.xp} / ${need}`;
+  document.getElementById('xpBar').style.width = Math.min(100,(CURRENT_USER.xp/need)*100)+'%';
+
+  const capStat = 100;
+  document.getElementById('noorVal').textContent = CURRENT_USER.noor;
+  document.getElementById('hikmahVal').textContent = CURRENT_USER.hikmah;
+  document.getElementById('hezVal').textContent = CURRENT_USER.hez;
+  document.getElementById('noorBar').style.width = Math.min(100, (CURRENT_USER.noor/capStat)*100)+'%';
+  document.getElementById('hikmahBar').style.width = Math.min(100, (CURRENT_USER.hikmah/capStat)*100)+'%';
+  document.getElementById('hezBar').style.width = Math.min(100, (CURRENT_USER.hez/capStat)*100)+'%';
+}
+function goDashboard(){ sfxClick(); showScreen('screen-dashboard'); renderDashboard(); }
+
+/* ---------- DIFFICULTY HELPER ---------- */
+function difficultyTier(level){
+  if(level<=3) return 1;
+  if(level<=6) return 2;
+  return 3;
+}
+
+/* =========================================================
+   QUESTION BANKS (15+ per branch, tagged by difficulty 1-3)
+   ========================================================= */
+const BANK = {
+  kurdish: [
+    {d:1,q:"وشەی 'گەورە' پێچەوانەکەی چیە؟", o:["بچووک","بەرز","دوور","خۆش"], c:0},
+    {d:1,q:"کام وشەیە کۆی 'کتێب'؟", o:["کتێبەکان","کتێبیش","کتێبدا","کتێبەوە"], c:0},
+    {d:1,q:"'خۆر' واتای چیە بە ئینگلیزی؟", o:["Moon","Sun","Star","Sky"], c:1},
+    {d:1,q:"پێچەوانەی 'ڕووناک' کامەیە؟", o:["تاریک","سارد","گەرم","بەرز"], c:0},
+    {d:1,q:"'دایک' لە ڕستەدا چ ڕۆڵێکی هەیە؟ (ناو/کردار)", o:["کردار","ناو","ڕەنگدەر","کاردانگ"], c:1},
+    {d:2,q:"کام وشەیە هاوواتای 'ئازایی'؟", o:["ترس","دلێری","کەسڵ","خەم"], c:1},
+    {d:2,q:"دروستکراوی ڕاستی ڕستە: '___ چوو بۆ قوتابخانە.'", o:["من دەچم","ئەو چوو","ئێمە دەچین","تۆ دەچیت"], c:1},
+    {d:2,q:"کام وشەیە ناوی ئامرازێکی خوێندنە؟", o:["پەنکە","پێنووس","تەلەفزیۆن","سەیارە"], c:1},
+    {d:2,q:"'شادی' پێچەوانەکەی چیە؟", o:["خەم","خۆشی","هیوا","ئارامی"], c:0},
+    {d:2,q:"کام لەمانە ناوی ڕۆژێکی هەفتەیە؟", o:["نیسان","هەینی","بەهار","زستان"], c:1},
+    {d:3,q:"لە ڕستەی 'کوردستان زۆر جوانە'، کام وشە ڕەنگدەرە؟", o:["کوردستان","زۆر","جوانە","هیچکام"], c:2},
+    {d:3,q:"کام وشەیە ناوی هەستێکی مرۆڤایەتییە، نەک شتێکی بینراو؟", o:["بەرد","خۆشەویستی","کتێب","کورسی"], c:1},
+    {d:3,q:"دروستکردنی کۆی وشەی 'مامۆستا' بە شێوەی ڕێزدارانە:", o:["مامۆستاکان","مامۆستایان","مامۆستایانە","مامۆستاگەلی ڕێزدار"], c:3},
+    {d:3,q:"کام لەمانە بریتییە لە دەربڕینی سوپاسگوزاری؟", o:["ببورە","سوپاس بۆ تۆ","تکایە","بەخێر بێیت"], c:1},
+    {d:3,q:"لە ڕستەی 'ئەو بە خێرایی ڕا
