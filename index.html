@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>یاری فێربوونی وشەکان</title>
+    <style>
+        body { font-family: Tahoma, Arial, sans-serif; background-color: #f0f8ff; text-align: center; padding-top: 30px; }
+        h1 { color: #ff4500; font-size: 36px; }
+        #emoji-display { font-size: 100px; margin: 20px; text-shadow: 2px 2px 5px #ccc; }
+        .btn { background-color: #32cd32; color: white; border: none; padding: 15px 30px; font-size: 28px; margin: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn:hover { background-color: #228b22; transform: scale(1.05); }
+        #message { font-size: 26px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>با پێکەوە وشەکان فێربین! 🚀</h1>
+    <div id="emoji-display">🍎</div>
+    <div id="options"></div>
+    <p id="message"></p>
+
+    <script>
+        // لێرە دەتوانیت وشە و وێنەی زیاتر زیاد بکەیت
+        const words = [
+            { emoji: '🍎', correct: 'سێو', options: ['سێو', 'مۆز', 'ترێ'] },
+            { emoji: '🐈', correct: 'پشیلە', options: ['سەگ', 'پشیلە', 'مشک'] },
+            { emoji: '🏠', correct: 'ماڵ', options: ['قوتابخانە', 'ئۆتۆمبێل', 'ماڵ'] },
+            { emoji: '🌞', correct: 'خۆر', options: ['مانگ', 'خۆر', 'هەور'] }
+        ];
+        let current = 0;
+
+        function loadGame() {
+            if (current >= words.length) {
+                document.getElementById('emoji-display').innerText = '🎉';
+                document.getElementById('options').innerHTML = '<h2 style="color:green;">ئافەرین! هەموو وشەکانت زانی.</h2>';
+                document.getElementById('message').innerText = '';
+                return;
+            }
+            const data = words[current];
+            document.getElementById('emoji-display').innerText = data.emoji;
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            data.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, data.correct);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct) {
+            const msg = document.getElementById('message');
+            if (selected === correct) {
+                msg.innerText = 'ئافەرین! وەڵامەکە ڕاستە 👏';
+                msg.style.color = 'green';
+                current++;
+                setTimeout(() => { msg.innerText = ''; loadGame(); }, 1500); // دوای چرکەیەک دەچێتە وشەی داهاتوو
+            } else {
+                msg.innerText = 'نەخێر، هەڵەیە. دووبارە هەوڵ بدەرەوە!';
+                msg.style.color = 'red';
+            }
+        }
+        
+        loadGame();
+    </script>
+</body>
+</html>
