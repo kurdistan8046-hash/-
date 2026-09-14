@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>یاری پەروەردەیی گشتگیر بۆ منداڵان</title>
+    <title>یاری پەروەردەیی گشتگیر</title>
     <style>
         :root {
             --bg-color: #f4f6f9;
@@ -72,14 +72,12 @@
         .mode-btn.active-mixed { background: var(--purple); color: white; }
 
         #question-area {
-            font-size: 28px; margin: 20px 0; min-height: 80px;
+            font-size: 26px; margin: 20px 0; min-height: 80px;
             display: flex; justify-content: center; align-items: center;
             font-weight: bold; color: #222; line-height: 1.5;
         }
 
-        #math-area {
-            font-size: 60px; font-weight: bold; direction: ltr; color: var(--danger);
-        }
+        #math-area { font-size: 55px; font-weight: bold; direction: ltr; color: var(--danger); }
 
         #options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
@@ -88,10 +86,11 @@
             padding: 15px 10px; font-size: 20px; font-weight: bold;
             border-radius: 12px; cursor: pointer; transition: 0.2s;
         }
-        .btn:hover { border-color: var(--primary); background-color: #f0fdf4; }
-        .btn:active { transform: scale(0.97); }
+        .btn:hover:not(:disabled) { border-color: var(--primary); background-color: #f0fdf4; }
+        .btn:active:not(:disabled) { transform: scale(0.97); }
+        .btn:disabled { cursor: not-allowed; opacity: 0.8; }
 
-        #message { font-size: 22px; font-weight: bold; margin-top: 20px; min-height: 35px; }
+        #message { font-size: 22px; font-weight: bold; margin-top: 20px; min-height: 35px; transition: 0.3s;}
 
         .progress-container { width: 100%; background: #eee; border-radius: 10px; margin-top: 20px; height: 15px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--warning); width: 0%; transition: width 0.5s ease; }
@@ -104,7 +103,8 @@
         
         @media(max-width: 480px) {
             #options { grid-template-columns: 1fr; }
-            #question-area { font-size: 22px; }
+            #question-area { font-size: 20px; }
+            #math-area { font-size: 45px; }
         }
     </style>
 </head>
@@ -122,13 +122,13 @@
     <div class="game-board" id="board">
         <div class="categories">
             <button class="mode-btn" id="btnMixed" onclick="setMode('mixed')">🔀 تێکەڵ</button>
-            <button class="mode-btn" id="btnKurdish" onclick="setMode('kurdish')">📖 زمانی کوردی</button>
+            <button class="mode-btn" id="btnKurdish" onclick="setMode('kurdish')">📖 کوردی</button>
             <button class="mode-btn" id="btnReligion" onclick="setMode('religion')">🕌 ئاینی</button>
-            <button class="mode-btn" id="btnScience" onclick="setMode('science')">🔬 زانست و پەروەردە</button>
+            <button class="mode-btn" id="btnScience" onclick="setMode('science')">🔬 زانست</button>
             <button class="mode-btn" id="btnMath" onclick="setMode('math')">🔢 بیرکاری</button>
         </div>
 
-        <div id="question-area">پرسیار لێرە دەردەکەوێت</div>
+        <div id="question-area">سڵاو لە پاڵەوان... ئامادەی؟</div>
         <div id="options"></div>
         <p id="message"></p>
         
@@ -138,96 +138,105 @@
     </div>
 
     <script>
-        // گۆڕینی ژمارەکان بۆ ژمارەی کوردی
         function toKurdishNum(num) {
             const kurdishDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
             return num.toString().replace(/[0-9]/g, w => kurdishDigits[w]);
         }
 
-        // داتابەیسی پرسیارەکان (دەتوانیت تا ٢٠٠٠ پرسیار و زیاتریش لێرە زیاد بکەیت)
+        // داتابەیسی پرسیارەکان - تێبینی: property ی level زیادکراوە
+        // دەتوانیت هەزاران پرسیار لێرە زیاد بکەیت، منداڵەکە تەنها ئەو پرسیارانەی پێ دەدرێت کە لەگەڵ ئاستەکەیدا دەگونجێت
         const database = {
             kurdish: [
-                { q: "پێچەوانەی وشەی (گەورە) چییە؟", options: ["بچووک", "درێژ", "کورت", "قەڵەو"], a: "بچووک" },
-                { q: "هاوواتای وشەی (خێرا) چییە؟", options: ["توند", "خاو", "بەرەوڕوو", "گورج"], a: "گورج" },
-                { q: "پایتەختی کوردستان کوێیە؟", options: ["سلێمانی", "هەولێر", "دهۆک", "کەرکوک"], a: "هەولێر" },
-                { q: "کام لەم پیتانە بزوێنە؟", options: ["ب", "د", "ۆ", "س"], a: "ۆ" },
-                { q: "ناوی ئەم ئاژەڵە چییە کە شیری هەیە؟", options: ["مریشک", "مانگا", "قاز", "چۆلەکە"], a: "مانگا" },
-                { q: "کام وشە ناوی ڕووەکە؟", options: ["بەرد", "ئاو", "درەخت", "خاک"], a: "درەخت" }
+                { level: 1, q: "پێچەوانەی وشەی (گەورە) چییە؟", options: ["بچووک", "درێژ", "کورت", "قەڵەو"], a: "بچووک" },
+                { level: 1, q: "پایتەختی کوردستان کوێیە؟", options: ["سلێمانی", "هەولێر", "دهۆک", "کەرکوک"], a: "هەولێر" },
+                { level: 2, q: "هاوواتای وشەی (خێرا) چییە؟", options: ["توند", "خاو", "بەرەوڕوو", "گورج"], a: "گورج" },
+                { level: 3, q: "کام لەم پیتانە بزوێنە؟", options: ["ب", "د", "ۆ", "س"], a: "ۆ" },
+                { level: 4, q: "ئەو وشەیەی جێگەی ناو دەگرێتەوە پێی دەوترێت چی؟", options: ["کردار", "ئاوەڵناو", "جێناو", "هاوەڵکار"], a: "جێناو" }
             ],
             religion: [
-                { q: "یەکەم پێغەمبەر کێ بوو؟", options: ["نوح (د.خ)", "ئادەم (د.خ)", "عیسا (د.خ)", "موسا (د.خ)"], a: "ئادەم (د.خ)" },
-                { q: "قورئانی پیرۆز بە چ زمانێک دابەزیوە؟", options: ["کوردی", "فارسی", "عەرەبی", "ئینگلیزی"], a: "عەرەبی" },
-                { q: "ڕۆژانە چەند فەرزە نوێژ دەکەین؟", options: ["٣ فەرزە", "٤ فەرزە", "٥ فەرزە", "٦ فەرزە"], a: "٥ فەرزە" },
-                { q: "دوایین پێغەمبەر کێیە؟", options: ["عیسا (د.خ)", "موسا (د.خ)", "ئیبراهیم (د.خ)", "محەمەد (د.خ)"], a: "محەمەد (د.خ)" },
-                { q: "مانگی ڕۆژووگرتن ناوی چییە؟", options: ["شەعبان", "ڕەمەزان", "موهەڕەم", "سەفەر"], a: "ڕەمەزان" }
+                { level: 1, q: "یەکەم پێغەمبەر کێ بوو؟", options: ["نوح (د.خ)", "ئادەم (د.خ)", "عیسا (د.خ)", "موسا (د.خ)"], a: "ئادەم (د.خ)" },
+                { level: 1, q: "ڕۆژانە چەند فەرزە نوێژ دەکەین؟", options: ["٣", "٤", "٥", "٦"], a: "٥" },
+                { level: 2, q: "قورئانی پیرۆز بە چ زمانێک دابەزیوە؟", options: ["کوردی", "فارسی", "عەرەبی", "ئینگلیزی"], a: "عەرەبی" },
+                { level: 3, q: "یەکەم سوورەتی قورئان کامەیە؟", options: ["البقرة", "الفاتحة", "الناس", "الإخلاص"], a: "الفاتحة" },
+                { level: 4, q: "ئەو فریشتەیەی وەحی هێناوە بۆ پێغەمبەر (د.خ) ناوی چییە؟", options: ["میکائیل", "ئیسرافیل", "عیزرائیل", "جوبرەئیل"], a: "جوبرەئیل" }
             ],
             science: [
-                { q: "ئێمە بە چی هەناسە دەدەین؟", options: ["سییەکان", "دڵ", "گەدە", "مێشک"], a: "سییەکان" },
-                { q: "ڕەنگی ئاسمان لە ڕۆژدا چۆنە؟", options: ["سوور", "شین", "سەوز", "زەرد"], a: "شین" },
-                { q: "ئاو لە چ پلەیەکدا دەیبەستێت (دەبێتە سەهۆڵ)؟", options: ["١٠٠ پلە", "٥٠ پلە", "٠ پلە", "١٠ پلە"], a: "٠ پلە" },
-                { q: "کام هەسارە بە هەسارەی سوور ناسراوە؟", options: ["زەوی", "مەریخ", "عەتارید", "موشتەری"], a: "مەریخ" },
-                { q: "کاتێک دەپژمین پێویستە چی بڵێین؟", options: ["سوپاس", "الحمدلله", "سڵاو", "خوات لەگەڵ"], a: "الحمدلله" }
+                { level: 1, q: "ئێمە بە چی هەناسە دەدەین؟", options: ["سییەکان", "دڵ", "گەدە", "مێشک"], a: "سییەکان" },
+                { level: 1, q: "ڕەنگی ئاسمان لە ڕۆژدا چۆنە؟", options: ["سوور", "شین", "سەوز", "زەرد"], a: "شین" },
+                { level: 2, q: "ئاو لە چ پلەیەکدا دەیبەستێت؟", options: ["١٠٠", "٥٠", "٠", "١٠"], a: "٠" },
+                { level: 3, q: "هەسارەی زەوی بە دەوری چیدا دەسوڕێتەوە؟", options: ["مانگ", "مەریخ", "خۆر", "هەورەکان"], a: "خۆر" },
+                { level: 4, q: "خێراترین ئاژەڵ لە جیهاندا کامەیە؟", options: ["شێر", "پڵنگ", "چیتە (شیتا)", "ئەسپی کێوی"], a: "چیتە (شیتا)" }
             ]
         };
 
-        // مۆلیدەی پرسیاری بیرکاری بێسنوور
-        function generateMath() {
+        // مۆلیدەی پێشکەوتووی بیرکاری بەپێی ئاست
+        function generateMath(currentLevel) {
             let num1, num2, sign, answer;
-            let op = Math.random();
             
-            if (op < 0.5 || level <= 2) {
-                // کۆکردنەوە
-                num1 = Math.floor(Math.random() * (level * 5)) + 1;
-                num2 = Math.floor(Math.random() * (level * 5)) + 1;
-                sign = '+';
-                answer = num1 + num2;
-            } else if (op < 0.8) {
-                // لێدەرکردن (هەمیشە گەورەتر کەمتی بچووکتر)
-                num1 = Math.floor(Math.random() * (level * 5)) + 5;
-                num2 = Math.floor(Math.random() * num1) + 1;
-                sign = '-';
-                answer = num1 - num2;
+            if (currentLevel <= 2) {
+                // ئاستی ١ و ٢: کۆکردنەوە و لێدەرکردنی سادە (١ بۆ ١٠)
+                num1 = Math.floor(Math.random() * 10) + 1;
+                num2 = Math.floor(Math.random() * 10) + 1;
+                sign = Math.random() > 0.5 ? '+' : '-';
+                if (sign === '-' && num1 < num2) [num1, num2] = [num2, num1]; // هەمیشە گەورەتر یەکەم بێت
+            } else if (currentLevel <= 5) {
+                // ئاستی ٣ تا ٥: ژمارەی گەورەتر و لێکدانی سادە
+                let rand = Math.random();
+                if (rand < 0.4) { sign = '+'; num1 = Math.floor(Math.random() * 30) + 5; num2 = Math.floor(Math.random() * 20) + 1; }
+                else if (rand < 0.8) { sign = '-'; num1 = Math.floor(Math.random() * 30) + 10; num2 = Math.floor(Math.random() * num1) + 1; }
+                else { sign = '×'; num1 = Math.floor(Math.random() * 5) + 2; num2 = Math.floor(Math.random() * 5) + 2; }
             } else {
-                // لێکدان (بۆ ئاستە بەرزەکان)
-                num1 = Math.floor(Math.random() * 9) + 1;
-                num2 = Math.floor(Math.random() * 5) + 1;
-                sign = '×';
-                answer = num1 * num2;
-            }
-
-            let qStr = `<span id="math-area">${toKurdishNum(num1)} ${sign} ${toKurdishNum(num2)}</span>`;
-            
-            let options = [answer];
-            while (options.length < 4) {
-                let fake = answer + (Math.floor(Math.random() * 10) - 5);
-                if (fake !== answer && fake >= 0 && !options.includes(fake)) {
-                    options.push(fake);
+                // ئاستی ٦ بەرەو سەر: دابەشکردن و لێکدانی گەورەتر
+                let rand = Math.random();
+                if (rand < 0.3) { sign = '×'; num1 = Math.floor(Math.random() * 9) + 3; num2 = Math.floor(Math.random() * 9) + 2; }
+                else if (rand < 0.6) { 
+                    sign = '÷'; 
+                    num2 = Math.floor(Math.random() * 9) + 2; 
+                    answer = Math.floor(Math.random() * 9) + 2; 
+                    num1 = num2 * answer; 
                 }
+                else { sign = '+'; num1 = Math.floor(Math.random() * 100) + 20; num2 = Math.floor(Math.random() * 50) + 10; }
+            }
+
+            if (sign === '+') answer = num1 + num2;
+            else if (sign === '-') answer = num1 - num2;
+            else if (sign === '×') answer = num1 * num2;
+            else if (sign === '÷') answer = num1 / num2;
+
+            let qStr = `<span id="math-area" dir="ltr">${toKurdishNum(num1)} ${sign} ${toKurdishNum(num2)}</span>`;
+            
+            let options = new Set([answer]);
+            while (options.size < 4) {
+                let offset = Math.floor(Math.random() * 15) - 7;
+                let fake = answer + offset;
+                if (fake !== answer && fake >= 0) options.add(fake);
             }
             
-            // گۆڕینی هەموو هەڵبژاردەکان بۆ ژمارەی کوردی
-            let kurdishOptions = options.map(opt => toKurdishNum(opt));
-
-            return { q: qStr, options: kurdishOptions, a: toKurdishNum(answer) };
+            return { 
+                q: qStr, 
+                options: Array.from(options).map(toKurdishNum), 
+                a: toKurdishNum(answer) 
+            };
         }
 
         let currentMode = 'mixed';
         let level = parseInt(localStorage.getItem('kurdEduLevel')) || 1;
         let xp = parseInt(localStorage.getItem('kurdEduXP')) || 0;
-        let xpNeeded = level * 100;
+        let xpNeeded = 100 + (level * 20); // کەمێک سەختتر دەبێت بەپێی ئاست
         let currentAnswer = '';
+        let isProcessing = false;
 
         function updateUI() {
             document.getElementById('levelDisplay').innerText = toKurdishNum(level);
             document.getElementById('xpDisplay').innerText = toKurdishNum(xp);
-            let xpPercent = (xp / xpNeeded) * 100;
+            let xpPercent = Math.min((xp / xpNeeded) * 100, 100);
             document.getElementById('xpBar').style.width = xpPercent + '%';
         }
 
         function saveData() {
             localStorage.setItem('kurdEduLevel', level);
             localStorage.setItem('kurdEduXP', xp);
-            xpNeeded = level * 100;
+            xpNeeded = 100 + (level * 20);
             updateUI();
         }
 
@@ -248,27 +257,27 @@
         }
 
         function loadQuestion() {
+            isProcessing = false;
             const qArea = document.getElementById('question-area');
             const optionsDiv = document.getElementById('options');
             optionsDiv.innerHTML = '';
             
             let questionObj;
+            let category = currentMode;
 
-            if (currentMode === 'math') {
-                questionObj = generateMath();
+            if (category === 'mixed') {
+                const cats = ['kurdish', 'religion', 'science', 'math'];
+                category = cats[Math.floor(Math.random() * cats.length)];
+            }
+            
+            if (category === 'math') {
+                questionObj = generateMath(level);
             } else {
-                let category = currentMode;
-                if (currentMode === 'mixed') {
-                    const cats = ['kurdish', 'religion', 'science', 'math'];
-                    category = cats[Math.floor(Math.random() * cats.length)];
-                }
+                // پاڵاوتنی پرسیارەکان بەپێی ئاستی یاریزان
+                let availableQs = database[category].filter(q => q.level <= level);
+                if (availableQs.length === 0) availableQs = database[category]; // ئەگەر پرسیار نەما، هەمووی پیشان بدە
                 
-                if (category === 'math') {
-                    questionObj = generateMath();
-                } else {
-                    let catArray = database[category];
-                    questionObj = catArray[Math.floor(Math.random() * catArray.length)];
-                }
+                questionObj = availableQs[Math.floor(Math.random() * availableQs.length)];
             }
 
             currentAnswer = questionObj.a;
@@ -286,6 +295,9 @@
         }
 
         function checkAnswer(selected, btnElement) {
+            if (isProcessing) return;
+            isProcessing = true;
+
             const msg = document.getElementById('message');
             const board = document.getElementById('board');
             const allBtns = document.querySelectorAll('.btn');
@@ -300,11 +312,11 @@
                 
                 createConfetti();
 
-                xp += 10;
+                xp += 20; // خاڵی زیاتر بۆ وەڵامی ڕاست
                 if (xp >= xpNeeded) {
                     level++;
                     xp = 0;
-                    msg.innerText = `ئافەرین! چوویتە ئاستی ${toKurdishNum(level)} 🎉`;
+                    msg.innerText = `ئافەرین! سەرکەوتیت بۆ ئاستی ${toKurdishNum(level)} 🎉`;
                 }
                 saveData();
 
@@ -321,12 +333,17 @@
                 btnElement.style.backgroundColor = 'var(--danger)';
                 btnElement.style.color = 'white';
                 
+                // کەمکردنەوەی خاڵ لە کاتی هەڵە (بۆ دروستکردنی کێبڕکێ)
+                xp = Math.max(0, xp - 5);
+                saveData();
+                
                 setTimeout(() => { 
                     board.classList.remove('shake'); 
                     msg.innerText = '';
                     btnElement.style.backgroundColor = '';
                     btnElement.style.color = '';
                     allBtns.forEach(b => b.disabled = false);
+                    isProcessing = false;
                 }, 1200);
             }
         }
@@ -334,7 +351,7 @@
         function createConfetti() {
             const board = document.getElementById('board');
             const colors = ['#ed2024', '#278e43', '#f9af1b', '#2196F3'];
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 40; i++) {
                 let conf = document.createElement('div');
                 conf.className = 'confetti';
                 conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
