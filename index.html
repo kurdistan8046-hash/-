@@ -3,945 +3,924 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ئەکادیمیای زیرەک | یارییەکی فێربوون</title>
+<title>یاری بیرکاری کوردی - Kurdish Math Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   ZIRAK ACADEMY — design tokens
-   sky -> grape gradient world, sun-yellow accent, owl mascot 🦉
-   ============================================================ */
-:root{
-  --sky-top:#57C2F5;
-  --sky-bottom:#8D6BEE;
-  --sun:#FFC93C;
-  --sun-dark:#F2A200;
-  --grass:#4CD37B;
-  --grass-dark:#2FAE5E;
-  --coral:#FF5D7A;
-  --coral-dark:#E4425F;
-  --grape:#9B5DE5;
-  --ink:#2B2447;
-  --ink-soft:#5B5478;
-  --card:#FFFFFF;
-  --cream:#FFF6E5;
-  --shadow: 0 10px 0 rgba(43,36,71,0.12);
-  --radius-lg: 28px;
-  --radius-md: 18px;
-  --radius-sm: 12px;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html,body{height:100%;}
-body{
-  margin:0;
-  font-family:'Vazirmatn', Tahoma, sans-serif;
-  background:
-    radial-gradient(circle at 15% 8%, rgba(255,255,255,0.35) 0, transparent 40%),
-    radial-gradient(circle at 85% 18%, rgba(255,255,255,0.25) 0, transparent 35%),
-    linear-gradient(160deg, var(--sky-top) 0%, var(--sky-bottom) 100%);
-  min-height:100vh;
-  color:var(--ink);
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-#app{
-  max-width:480px;
-  margin:0 auto;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  position:relative;
-  padding-bottom:calc(12px + var(--safe-bottom));
-}
-.screen{ display:none; flex-direction:column; flex:1; padding:18px 16px; animation:fadeIn .35s ease; }
-.screen.active{ display:flex; }
-@keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  :root{
+    --primary:#58cc02;
+    --primary-dark:#46a302;
+    --blue:#1cb0f6;
+    --blue-dark:#1899d6;
+    --orange:#ff9600;
+    --orange-dark:#e08600;
+    --red:#ff4b4b;
+    --red-dark:#d63e3e;
+    --purple:#8549ba;
+    --bg1:#7f5af0;
+    --bg2:#2cb1ff;
+    --card:#ffffff;
+    --text:#222;
+    --muted:#8b8b8b;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Vazirmatn', Tahoma, Arial, sans-serif;
+    background: linear-gradient(160deg, var(--bg1), var(--bg2));
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow-x:hidden;
+    color:var(--text);
+    user-select:none;
+  }
+  #app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    padding:14px;
+    position:relative;
+  }
+  .screen{display:none; flex:1; flex-direction:column;}
+  .screen.active{display:flex;}
 
-/* clouds decoration */
-.cloud{ position:fixed; opacity:.55; pointer-events:none; filter:drop-shadow(0 4px 0 rgba(255,255,255,.2)); z-index:0; }
-.cloud svg{ width:100%; height:100%; }
+  /* ===== START SCREEN ===== */
+  #screen-start{
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:18px;
+    animation: fadeIn .5s ease;
+  }
+  .logo-emoji{
+    font-size:clamp(60px,18vw,90px);
+    animation: floatBounce 2.4s ease-in-out infinite;
+  }
+  @keyframes floatBounce{
+    0%,100%{transform:translateY(0) rotate(-3deg);}
+    50%{transform:translateY(-14px) rotate(3deg);}
+  }
+  #screen-start h1{
+    color:#fff;
+    font-size:clamp(24px,7vw,32px);
+    margin:0;
+    text-shadow:0 3px 0 rgba(0,0,0,0.15);
+  }
+  #screen-start p{
+    color:#eaf6ff;
+    font-size:clamp(14px,4vw,17px);
+    margin:0 0 6px 0;
+    max-width:320px;
+  }
+  .stat-pill-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .stat-pill{
+    background:rgba(255,255,255,0.18);
+    border:2px solid rgba(255,255,255,0.35);
+    border-radius:16px;
+    padding:8px 16px;
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    backdrop-filter: blur(4px);
+  }
+  .big-btn{
+    border:none;
+    border-radius:20px;
+    padding:18px 50px;
+    font-size:clamp(18px,5vw,22px);
+    font-weight:800;
+    font-family:inherit;
+    cursor:pointer;
+    color:#fff;
+    background: var(--primary);
+    border-bottom:6px solid var(--primary-dark);
+    box-shadow:0 0 0 rgba(88,204,2,0);
+    animation: glowPulse 1.8s ease-in-out infinite;
+    transition: transform .08s;
+  }
+  .big-btn:active{ transform:translateY(4px); border-bottom-width:2px; }
+  @keyframes glowPulse{
+    0%,100%{ box-shadow:0 0 8px 2px rgba(255,255,255,0.25);}
+    50%{ box-shadow:0 0 22px 8px rgba(255,255,255,0.55);}
+  }
+  .link-btn{
+    background:none;
+    border:none;
+    color:#eaf6ff;
+    text-decoration:underline;
+    font-size:13px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  #sound-toggle{
+    position:absolute;
+    top:16px;
+    left:16px;
+    background:rgba(255,255,255,0.2);
+    border:2px solid rgba(255,255,255,0.35);
+    border-radius:50%;
+    width:42px;
+    height:42px;
+    font-size:18px;
+    cursor:pointer;
+    color:#fff;
+  }
 
-/* ---------- Top bar (stats) ---------- */
-.topbar{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:8px; margin-bottom:14px; position:relative; z-index:2;
-}
-.stat-pill{
-  display:flex; align-items:center; gap:6px;
-  background:rgba(255,255,255,0.92);
-  border-radius:999px; padding:7px 12px;
-  box-shadow:var(--shadow);
-  font-weight:700; font-size:14px; color:var(--ink);
-  white-space:nowrap;
-}
-.stat-pill .icon{ font-size:16px; }
-.streak-pill.hot{ background:linear-gradient(135deg,#FFE1A8,#FFC93C); }
+  /* ===== GAME SCREEN ===== */
+  #screen-game{ gap:12px; }
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  #home-btn{
+    background:rgba(255,255,255,0.25);
+    border:none;
+    border-radius:12px;
+    width:40px;height:40px;
+    font-size:18px;
+    color:#fff;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .xp-wrap{ flex:1; display:flex; flex-direction:column; gap:4px;}
+  .level-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:#fff;
+    font-weight:700;
+    font-size:13px;
+  }
+  .xp-bar-bg{
+    background:rgba(255,255,255,0.25);
+    border-radius:10px;
+    height:14px;
+    overflow:hidden;
+    border:2px solid rgba(255,255,255,0.4);
+  }
+  .xp-bar-fill{
+    height:100%;
+    width:0%;
+    background: linear-gradient(90deg,#ffd23f,#ff9600);
+    border-radius:10px;
+    transition: width .5s cubic-bezier(.4,1.5,.6,1);
+  }
+  .stats-row{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .stat-box{
+    flex:1;
+    background:rgba(255,255,255,0.18);
+    border-radius:14px;
+    padding:8px;
+    text-align:center;
+    color:#fff;
+  }
+  .stat-box .num{ font-size:18px; font-weight:800; display:block;}
+  .stat-box .lbl{ font-size:11px; opacity:.9;}
 
-/* ---------- Level / XP bar ---------- */
-.xp-wrap{ margin-bottom:16px; position:relative; z-index:2; }
-.xp-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-.level-badge{
-  background:var(--grape); color:#fff; font-weight:800; font-size:13px;
-  border-radius:999px; padding:5px 12px; box-shadow:0 4px 0 #7238B8;
-}
-.xp-label{ font-size:12px; font-weight:700; color:rgba(255,255,255,.9); }
-.xp-track{
-  height:16px; background:rgba(255,255,255,.35); border-radius:999px;
-  overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,.15);
-}
-.xp-fill{
-  height:100%; border-radius:999px;
-  background:linear-gradient(90deg, var(--sun), var(--sun-dark));
-  width:0%; transition:width .6s cubic-bezier(.22,1.4,.4,1);
-  position:relative;
-}
-.xp-fill::after{
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(255,255,255,.5), transparent 60%);
-}
+  .band-tag{
+    align-self:center;
+    background:rgba(255,255,255,0.9);
+    color:var(--purple);
+    font-weight:700;
+    font-size:12px;
+    padding:5px 14px;
+    border-radius:20px;
+    margin-top:2px;
+  }
 
-/* ---------- Home / mascot ---------- */
-.mascot-hero{ text-align:center; margin:6px 0 18px; position:relative; z-index:2; }
-.mascot-emoji{ font-size:88px; display:inline-block; animation:bob 3s ease-in-out infinite; filter:drop-shadow(0 10px 8px rgba(0,0,0,.15)); }
-@keyframes bob{ 0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(-10px) rotate(2deg);} }
-.hero-title{ color:#fff; font-weight:900; font-size:26px; margin:10px 0 2px; text-shadow:0 3px 0 rgba(0,0,0,.12); }
-.hero-sub{ color:rgba(255,255,255,.9); font-weight:600; font-size:14px; margin:0; }
+  #game-card{
+    background:var(--card);
+    border-radius:26px;
+    padding:26px 18px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:26px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.25);
+    margin-top:6px;
+  }
+  #question-text{
+    font-size:clamp(28px,8vw,40px);
+    font-weight:800;
+    text-align:center;
+    direction:ltr;
+    unicode-bidi:isolate;
+    color:#333;
+    letter-spacing:1px;
+    line-height:1.4;
+  }
+  .choices-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    width:100%;
+  }
+  .choice-btn{
+    font-family:inherit;
+    font-size:clamp(20px,6vw,26px);
+    font-weight:800;
+    padding:18px 6px;
+    border-radius:16px;
+    border:none;
+    border-bottom:5px solid rgba(0,0,0,0.18);
+    cursor:pointer;
+    color:#fff;
+    direction:ltr;
+    transition: transform .08s, box-shadow .2s;
+  }
+  .choice-btn:nth-child(1){ background:var(--blue); border-bottom-color:var(--blue-dark);}
+  .choice-btn:nth-child(2){ background:var(--orange); border-bottom-color:var(--orange-dark);}
+  .choice-btn:nth-child(3){ background:var(--purple); border-bottom-color:#5f3488;}
+  .choice-btn:nth-child(4){ background:var(--primary); border-bottom-color:var(--primary-dark);}
+  .choice-btn:active:not(:disabled){ transform:translateY(4px); border-bottom-width:1px; }
+  .choice-btn:disabled{ cursor:default; }
+  .choice-btn.correct{
+    background:var(--primary) !important;
+    border-bottom-color:var(--primary-dark) !important;
+    box-shadow:0 0 20px 4px rgba(88,204,2,0.8);
+    animation: pop .35s ease;
+  }
+  .choice-btn.wrong{
+    background:var(--red) !important;
+    border-bottom-color:var(--red-dark) !important;
+    box-shadow:0 0 20px 4px rgba(255,75,75,0.8);
+  }
+  @keyframes pop{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+    100%{transform:scale(1);}
+  }
+  .shake{ animation: shakeAnim .5s; }
+  @keyframes shakeAnim{
+    10%,90%{transform:translateX(-3px);}
+    20%,80%{transform:translateX(6px);}
+    30%,50%,70%{transform:translateX(-10px);}
+    40%,60%{transform:translateX(10px);}
+  }
 
-/* ---------- Category grid ---------- */
-.cat-grid{
-  display:grid; grid-template-columns:1fr 1fr; gap:12px;
-  position:relative; z-index:2; margin-bottom:10px;
-}
-.cat-card{
-  background:var(--card); border:none; border-radius:var(--radius-md);
-  padding:16px 10px 14px; box-shadow:var(--shadow);
-  display:flex; flex-direction:column; align-items:center; gap:6px;
-  cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
-  font-family:inherit;
-}
-.cat-card:active{ transform:translateY(6px); box-shadow:0 4px 0 rgba(43,36,71,0.12); }
-.cat-card .cat-emoji{ font-size:34px; }
-.cat-card .cat-name{ font-weight:800; font-size:15px; color:var(--ink); }
-.cat-card .cat-progress{ font-size:11px; color:var(--ink-soft); font-weight:600; }
-.cat-card.mixed{ grid-column:1/-1; flex-direction:row; justify-content:center; gap:12px; background:linear-gradient(135deg,#FFE1A8,#FFC93C); }
-.cat-card.mixed .cat-emoji{ font-size:30px; }
+  #feedback-line{
+    min-height:22px;
+    font-weight:700;
+    font-size:14px;
+    text-align:center;
+    color:var(--muted);
+  }
 
-/* ---------- Buttons ---------- */
-.btn{
-  border:none; border-radius:999px; font-family:inherit; font-weight:800;
-  font-size:16px; padding:14px 22px; cursor:pointer; width:100%;
-  transition:transform .1s ease, box-shadow .1s ease; color:#fff;
-}
-.btn:active{ transform:translateY(5px); }
-.btn-primary{ background:var(--grass); box-shadow:0 5px 0 var(--grass-dark); }
-.btn-primary:active{ box-shadow:0 1px 0 var(--grass-dark); }
-.btn-secondary{ background:rgba(255,255,255,.9); color:var(--ink); box-shadow:0 5px 0 rgba(43,36,71,0.18); }
-.btn-secondary:active{ box-shadow:0 1px 0 rgba(43,36,71,0.18); }
-.btn-sun{ background:var(--sun); color:var(--ink); box-shadow:0 5px 0 var(--sun-dark); }
-.btn-sun:active{ box-shadow:0 1px 0 var(--sun-dark); }
-.btn:disabled{ opacity:.5; pointer-events:none; }
+  /* Confetti */
+  #confetti-container{
+    position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:999;
+  }
+  .confetti-piece{
+    position:absolute;
+    top:-20px;
+    width:9px;
+    height:15px;
+    opacity:0.95;
+    animation-name: confettiFall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+  @keyframes confettiFall{
+    to{ transform: translateY(115vh) rotate(560deg); opacity:0.1; }
+  }
 
-/* ---------- Quiz screen ---------- */
-.quiz-header{ display:flex; align-items:center; gap:10px; margin-bottom:16px; position:relative; z-index:2; }
-.back-btn{
-  background:rgba(255,255,255,.92); border:none; border-radius:50%;
-  width:38px; height:38px; font-size:18px; cursor:pointer; box-shadow:var(--shadow);
-  display:flex; align-items:center; justify-content:center; flex-shrink:0;
-}
-.progress-track{ flex:1; height:14px; background:rgba(255,255,255,.35); border-radius:999px; overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,.12); }
-.progress-fill{ height:100%; background:linear-gradient(90deg,#fff,#FFE9B8); border-radius:999px; transition:width .4s ease; }
-.hearts{ display:flex; gap:2px; font-size:16px; flex-shrink:0; }
+  /* Level up toast */
+  #levelup-toast{
+    position:fixed;
+    top:-120px;
+    left:50%;
+    transform:translateX(-50%);
+    background:linear-gradient(135deg,#ffd23f,#ff9600);
+    color:#5a3700;
+    padding:16px 30px;
+    border-radius:20px;
+    font-weight:800;
+    font-size:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+    z-index:1000;
+    text-align:center;
+    transition: top .5s cubic-bezier(.4,1.6,.6,1);
+  }
+  #levelup-toast.show{ top:24px; }
 
-.question-card{
-  background:var(--card); border-radius:var(--radius-lg); padding:22px 18px;
-  box-shadow:var(--shadow); margin-bottom:18px; position:relative; z-index:2;
-  min-height:120px; display:flex; flex-direction:column; justify-content:center;
-}
-.q-tag{ font-size:12px; font-weight:800; color:var(--grape); background:#F1E5FF; align-self:flex-start; padding:4px 10px; border-radius:999px; margin-bottom:10px; }
-.q-text{ font-size:20px; font-weight:800; line-height:1.55; color:var(--ink); }
-.q-emoji-big{ font-size:46px; text-align:center; margin-bottom:6px; }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
 
-.options-grid{ display:flex; flex-direction:column; gap:10px; position:relative; z-index:2; margin-bottom:16px; }
-.option-btn{
-  background:var(--card); border:3px solid #ECE9F5; border-radius:var(--radius-md);
-  padding:14px 16px; font-family:inherit; font-size:17px; font-weight:700; color:var(--ink);
-  text-align:right; cursor:pointer; box-shadow:0 4px 0 #ECE9F5;
-  transition:transform .08s ease, box-shadow .08s ease, background .15s ease, border-color .15s ease;
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-}
-.option-btn:active{ transform:translateY(3px); }
-.option-btn .opt-letter{
-  background:#F3F1FA; color:var(--ink-soft); font-weight:800; font-size:13px;
-  width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-}
-.option-btn.correct{ background:#E4FBEC; border-color:var(--grass); box-shadow:0 4px 0 var(--grass-dark); }
-.option-btn.correct .opt-letter{ background:var(--grass); color:#fff; }
-.option-btn.wrong{ background:#FFE9EC; border-color:var(--coral); box-shadow:0 4px 0 var(--coral-dark); }
-.option-btn.wrong .opt-letter{ background:var(--coral); color:#fff; }
-.option-btn.disabled{ pointer-events:none; opacity:.55; }
-.option-btn.disabled.correct, .option-btn.disabled.wrong{ opacity:1; }
-
-.feedback-bar{
-  position:relative; z-index:2; border-radius:var(--radius-md); padding:14px 16px;
-  display:none; align-items:center; gap:10px; margin-bottom:10px; font-weight:800; font-size:15px;
-}
-.feedback-bar.show{ display:flex; animation:slideUp .3s ease; }
-@keyframes slideUp{ from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);} }
-.feedback-bar.good{ background:#E4FBEC; color:var(--grass-dark); }
-.feedback-bar.bad{ background:#FFE9EC; color:var(--coral-dark); }
-.feedback-emoji{ font-size:26px; }
-.feedback-text{ flex:1; }
-.feedback-text small{ display:block; font-weight:600; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
-
-/* shake on wrong */
-.shake{ animation:shake .45s; }
-@keyframes shake{
-  10%,90%{ transform:translateX(-2px); }
-  20%,80%{ transform:translateX(4px); }
-  30%,50%,70%{ transform:translateX(-8px); }
-  40%,60%{ transform:translateX(8px); }
-}
-
-/* ---------- Modals ---------- */
-.modal-overlay{
-  position:fixed; inset:0; background:rgba(43,36,71,.55); z-index:50;
-  display:none; align-items:center; justify-content:center; padding:20px;
-}
-.modal-overlay.show{ display:flex; }
-.modal-card{
-  background:var(--card); border-radius:28px; padding:30px 24px 26px; text-align:center;
-  max-width:360px; width:100%; box-shadow:0 20px 40px rgba(0,0,0,.25);
-  animation:popIn .4s cubic-bezier(.2,1.4,.4,1);
-}
-@keyframes popIn{ from{opacity:0; transform:scale(.7);} to{opacity:1; transform:scale(1);} }
-.modal-emoji{ font-size:64px; margin-bottom:6px; }
-.modal-title{ font-size:24px; font-weight:900; margin:4px 0 6px; color:var(--ink); }
-.modal-sub{ font-size:14.5px; color:var(--ink-soft); font-weight:600; margin-bottom:18px; line-height:1.6; }
-.modal-stats{ display:flex; gap:10px; justify-content:center; margin-bottom:20px; }
-.modal-stat{ background:var(--cream); border-radius:16px; padding:10px 16px; min-width:78px; }
-.modal-stat .n{ font-weight:900; font-size:20px; color:var(--ink); }
-.modal-stat .l{ font-size:11px; font-weight:700; color:var(--ink-soft); }
-
-/* confetti */
-.confetti-piece{
-  position:fixed; top:-20px; width:10px; height:16px; z-index:60; pointer-events:none;
-  animation:confettiFall linear forwards;
-}
-@keyframes confettiFall{
-  to{ transform:translateY(110vh) rotate(540deg); opacity:.9; }
-}
-
-footer.made-by{ text-align:center; color:rgba(255,255,255,.75); font-size:11px; font-weight:600; padding:10px 0 4px; position:relative; z-index:2; }
+  @media (max-width:340px){
+    .choice-btn{ font-size:18px; padding:14px 4px; }
+    #question-text{ font-size:26px; }
+  }
 </style>
 </head>
 <body>
-
-<!-- decorative clouds -->
-<div class="cloud" style="top:6%; right:-30px; width:120px; height:60px;"><svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="60" rx="55" ry="35" fill="white"/><ellipse cx="110" cy="45" rx="45" ry="40" fill="white"/><ellipse cx="150" cy="65" rx="40" ry="28" fill="white"/></svg></div>
-<div class="cloud" style="top:22%; left:-40px; width:100px; height:50px;"><svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="60" rx="55" ry="35" fill="white"/><ellipse cx="110" cy="45" rx="45" ry="40" fill="white"/><ellipse cx="150" cy="65" rx="40" ry="28" fill="white"/></svg></div>
-
 <div id="app">
 
-  <!-- ======================= HOME SCREEN ======================= -->
-  <section class="screen active" id="screen-home">
+  <button id="sound-toggle" title="دەنگ">🔊</button>
+
+  <!-- START SCREEN -->
+  <div class="screen active" id="screen-start">
+    <div class="logo-emoji">🧮</div>
+    <h1>یاری بیرکاری کوردی</h1>
+    <p>فێربوونی بیرکاری بە شێوەیەکی خۆش و یاری‌مانەیی! لە سەرەتاوە بگەرە بۆ ئاستی پرۆ 🚀</p>
+    <div class="stat-pill-row">
+      <div class="stat-pill">🏆 باشترین خاڵ: <span id="start-highscore">٠</span></div>
+      <div class="stat-pill">⭐ پلە: <span id="start-level">١</span></div>
+    </div>
+    <button class="big-btn" id="start-btn">دەستپێکردن ▶</button>
+    <button class="link-btn" id="reset-btn">دەستپێکردنەوەی یاری لە سەرەتا</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen" id="screen-game">
     <div class="topbar">
-      <div class="stat-pill"><span class="icon">💎</span><span id="home-gems">٠</span></div>
-      <div class="stat-pill streak-pill" id="home-streak-pill"><span class="icon">🔥</span><span id="home-streak">٠</span></div>
-    </div>
-
-    <div class="xp-wrap">
-      <div class="xp-row">
-        <span class="level-badge">ئاست <span id="home-level">١</span></span>
-        <span class="xp-label"><span id="home-xp">٠</span> / <span id="home-xp-need">١٠٠</span> XP</span>
-      </div>
-      <div class="xp-track"><div class="xp-fill" id="home-xp-fill"></div></div>
-    </div>
-
-    <div class="mascot-hero">
-      <div class="mascot-emoji">🦉</div>
-      <h1 class="hero-title">ئەکادیمیای زیرەک</h1>
-      <p class="hero-sub">بابەتێک هەڵبژێرە و دەست بکە بە فێربوون!</p>
-    </div>
-
-    <div class="cat-grid">
-      <button class="cat-card" data-cat="english">
-        <div class="cat-emoji">🔤</div>
-        <div class="cat-name">ئینگلیزی</div>
-        <div class="cat-progress" id="prog-english">٠ پرسیار</div>
-      </button>
-      <button class="cat-card" data-cat="math">
-        <div class="cat-emoji">🔢</div>
-        <div class="cat-name">بیرکاری</div>
-        <div class="cat-progress" id="prog-math">بێ کۆتایی</div>
-      </button>
-      <button class="cat-card" data-cat="kurdish">
-        <div class="cat-emoji">📖</div>
-        <div class="cat-name">زمانی کوردی</div>
-        <div class="cat-progress" id="prog-kurdish">٠ پرسیار</div>
-      </button>
-      <button class="cat-card" data-cat="science">
-        <div class="cat-emoji">🔬</div>
-        <div class="cat-name">زانست</div>
-        <div class="cat-progress" id="prog-science">٠ پرسیار</div>
-      </button>
-      <button class="cat-card" data-cat="religion">
-        <div class="cat-emoji">🕌</div>
-        <div class="cat-name">ئایینی</div>
-        <div class="cat-progress" id="prog-religion">٠ پرسیار</div>
-      </button>
-      <button class="cat-card mixed" data-cat="mixed">
-        <div class="cat-emoji">🔀</div>
-        <div class="cat-name">تێکەڵ</div>
-      </button>
-    </div>
-
-    <footer class="made-by">دروستکراوە بۆ منداڵانی زیرەکی کورد 💛</footer>
-  </section>
-
-  <!-- ======================= QUIZ SCREEN ======================= -->
-  <section class="screen" id="screen-quiz">
-    <div class="quiz-header">
-      <button class="back-btn" id="quiz-back">✕</button>
-      <div class="progress-track"><div class="progress-fill" id="quiz-progress-fill"></div></div>
-      <div class="hearts" id="quiz-hearts">❤️❤️❤️</div>
-    </div>
-
-    <div class="question-card">
-      <span class="q-tag" id="quiz-cat-tag">بابەت</span>
-      <div class="q-emoji-big" id="quiz-emoji"></div>
-      <div class="q-text" id="quiz-question">...</div>
-    </div>
-
-    <div class="options-grid" id="quiz-options"></div>
-
-    <div class="feedback-bar" id="quiz-feedback">
-      <div class="feedback-emoji" id="feedback-emoji">🎉</div>
-      <div class="feedback-text">
-        <span id="feedback-title">وەڵامی ڕاست!</span>
-        <small id="feedback-sub"></small>
+      <button id="home-btn" title="گەڕانەوە">🏠</button>
+      <div class="xp-wrap">
+        <div class="level-row">
+          <span>پلە <span id="hud-level">١</span></span>
+          <span id="hud-xp-text">٠ / ١٠٠</span>
+        </div>
+        <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-fill"></div></div>
       </div>
     </div>
 
-    <button class="btn btn-primary" id="quiz-next" style="display:none;">بەردەوامبوون</button>
-  </section>
+    <div class="band-tag" id="band-tag">کۆکردنەوە و لێدەرکردن</div>
 
-</div>
-
-<!-- ======================= LEVEL UP MODAL ======================= -->
-<div class="modal-overlay" id="modal-levelup">
-  <div class="modal-card">
-    <div class="modal-emoji">🏆</div>
-    <div class="modal-title">پایەت بەرزبووەوە!</div>
-    <div class="modal-sub">ئێستا لە ئاستی <b id="levelup-num">٢</b> یت. بەردەوام بە، تۆ ئەستێرەیت! 🌟</div>
-    <button class="btn btn-sun" id="levelup-close">زۆر باشە!</button>
-  </div>
-</div>
-
-<!-- ======================= SESSION COMPLETE MODAL ======================= -->
-<div class="modal-overlay" id="modal-complete">
-  <div class="modal-card">
-    <div class="modal-emoji" id="complete-emoji">🎉</div>
-    <div class="modal-title" id="complete-title">کۆتایی یاری!</div>
-    <div class="modal-sub" id="complete-sub">کارێکی نایابت کرد!</div>
-    <div class="modal-stats">
-      <div class="modal-stat"><div class="n" id="complete-correct">٠</div><div class="l">ڕاست</div></div>
-      <div class="modal-stat"><div class="n" id="complete-xp">٠</div><div class="l">XP وەرگیراو</div></div>
-      <div class="modal-stat"><div class="n" id="complete-streak">٠</div><div class="l">زنجیرە</div></div>
+    <div class="stats-row">
+      <div class="stat-box">🔥 <span class="num" id="hud-streak">٠</span><span class="lbl">زنجیرە</span></div>
+      <div class="stat-box">💯 <span class="num" id="hud-score">٠</span><span class="lbl">خاڵ</span></div>
+      <div class="stat-box">🏆 <span class="num" id="hud-high">٠</span><span class="lbl">باشترین</span></div>
     </div>
-    <button class="btn btn-primary" id="complete-close">گەڕانەوە بۆ ماڵەوە</button>
+
+    <div id="game-card">
+      <div id="question-text">؟</div>
+      <div class="choices-grid">
+        <button class="choice-btn" data-idx="0"></button>
+        <button class="choice-btn" data-idx="1"></button>
+        <button class="choice-btn" data-idx="2"></button>
+        <button class="choice-btn" data-idx="3"></button>
+      </div>
+      <div id="feedback-line">&nbsp;</div>
+    </div>
   </div>
+
 </div>
+
+<div id="confetti-container"></div>
+<div id="levelup-toast">🎉 پلەیەکی نوێ! پلە <span id="levelup-num">٢</span></div>
 
 <script>
-/* ================================================================
-   ZIRAK ACADEMY — game engine
-   ================================================================ */
+(function(){
+  "use strict";
 
-/* ---------------------------------------------------------------
-   0. UTILITIES
-   --------------------------------------------------------------- */
-const EASTERN_DIGITS = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-function toEastern(n){ return String(n).replace(/[0-9]/g, d => EASTERN_DIGITS[d]); }
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
-  return a;
-}
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  /* ============ KURDISH NUMERAL UTILS ============ */
+  const KD = {'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩','.':'٫','-':'-'};
+  function nk(input){
+    return String(input).split('').map(ch => KD[ch] !== undefined ? KD[ch] : ch).join('');
+  }
 
-/* Tiny WebAudio SFX (no external files needed) */
-const AudioFX = (() => {
-  let ctx;
-  function getCtx(){ if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)(); return ctx; }
-  function tone(freq, dur, type='sine', vol=0.18, delay=0){
+  const PLUS='+', MINUS='−', TIMES='×', DIV='÷', Q='؟';
+
+  /* ============ HELPERS ============ */
+  function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+  function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ [a,b]=[b,a%b]; } return a || 1; }
+
+  /* ============ CURRICULUM ENGINE ============ */
+
+  function genAddSub(level){
+    let max;
+    if(level<=3) max=9;
+    else if(level<=6) max=20;
+    else max=99;
+    const isAdd = Math.random()<0.5;
+    let a,b,answer,text;
+    if(isAdd){
+      a = randInt(1,max); b = randInt(1,max);
+      answer = a+b;
+      text = `${nk(a)} ${PLUS} ${nk(b)} = ${Q}`;
+    } else {
+      a = randInt(1,max); b = randInt(0,a);
+      answer = a-b;
+      text = `${nk(a)} ${MINUS} ${nk(b)} = ${Q}`;
+    }
+    return {text, answer, decimals:0};
+  }
+
+  function genMultDiv(level){
+    const tableMax = level<=14 ? 6 : (level<=17 ? 9 : 12);
+    const isMul = Math.random()<0.5;
+    let a,b,answer,text,customDistractors;
+    if(isMul){
+      a = randInt(1,tableMax); b = randInt(1,12);
+      answer = a*b;
+      text = `${nk(a)} ${TIMES} ${nk(b)} = ${Q}`;
+      customDistractors = [a+b, a*(b+1), Math.abs(a*(b-1))];
+    } else {
+      const d = randInt(1,tableMax); const qv = randInt(1,12);
+      const dividend = d*qv;
+      answer = qv;
+      text = `${nk(dividend)} ${DIV} ${nk(d)} = ${Q}`;
+      customDistractors = [qv+1, Math.max(0,qv-1), d];
+    }
+    return {text, answer, decimals:0, customDistractors};
+  }
+
+  function evalExpr(a,op1,b,op2,c){
+    if(op1==='×' && op2==='×') return a*b*c;
+    if(op1==='×'){ const left=a*b; return op2==='+' ? left+c : left-c; }
+    if(op2==='×'){ const right=b*c; return op1==='+' ? a+right : a-right; }
+    const mid = op1==='+' ? a+b : a-b;
+    return op2==='+' ? mid+c : mid-c;
+  }
+  function evalLeftToRight(a,op1,b,op2,c){
+    let v = op1==='+' ? a+b : (op1==='-' ? a-b : a*b);
+    v = op2==='+' ? v+c : (op2==='-' ? v-c : v*c);
+    return v;
+  }
+
+  function genMixed(level){
+    const ops = ['+','-','×'];
+    const maxNum = level<=25 ? 10 : 15;
+    for(let attempt=0; attempt<30; attempt++){
+      const a=randInt(1,maxNum), b=randInt(1,maxNum), c=randInt(1,maxNum);
+      const op1=ops[randInt(0,2)], op2=ops[randInt(0,2)];
+      const val = evalExpr(a,op1,b,op2,c);
+      if(Number.isInteger(val) && val>=0 && val<=999){
+        const wrongOrder = evalLeftToRight(a,op1,b,op2,c);
+        const s1 = op1==='×'?TIMES:(op1==='-'?MINUS:PLUS);
+        const s2 = op2==='×'?TIMES:(op2==='-'?MINUS:PLUS);
+        const text = `${nk(a)} ${s1} ${nk(b)} ${s2} ${nk(c)} = ${Q}`;
+        const customDistractors = (wrongOrder!==val && wrongOrder>=0) ? [wrongOrder] : [];
+        return {text, answer: val, decimals:0, customDistractors};
+      }
+    }
+    const a=randInt(1,10), b=randInt(1,10);
+    return {text:`${nk(a)} ${PLUS} ${nk(b)} = ${Q}`, answer:a+b, decimals:0};
+  }
+
+  function genMissing(level){
+    const maxNum = level<=35 ? 20 : 50;
+    const opsPool = ['+','-','×','÷'];
+    for(let attempt=0; attempt<30; attempt++){
+      const op = opsPool[randInt(0,3)];
+      const unkFirst = Math.random()<0.5;
+      let text, answer;
+      if(op==='+'){
+        const a=randInt(1,maxNum), b=randInt(1,maxNum), sum=a+b;
+        if(unkFirst){ answer=a; text=`🔲 ${PLUS} ${nk(b)} = ${nk(sum)}`; }
+        else { answer=b; text=`${nk(a)} ${PLUS} 🔲 = ${nk(sum)}`; }
+      } else if(op==='-'){
+        const a=randInt(1,maxNum), b=randInt(0,a), diff=a-b;
+        if(unkFirst){ answer=a; text=`🔲 ${MINUS} ${nk(b)} = ${nk(diff)}`; }
+        else { answer=b; text=`${nk(a)} ${MINUS} 🔲 = ${nk(diff)}`; }
+      } else if(op==='×'){
+        const a=randInt(1,12), b=randInt(1,12), prod=a*b;
+        if(unkFirst){ answer=a; text=`🔲 ${TIMES} ${nk(b)} = ${nk(prod)}`; }
+        else { answer=b; text=`${nk(a)} ${TIMES} 🔲 = ${nk(prod)}`; }
+      } else {
+        const b=randInt(1,12), qv=randInt(1,12), a=b*qv;
+        if(unkFirst){ answer=a; text=`🔲 ${DIV} ${nk(b)} = ${nk(qv)}`; }
+        else { answer=b; text=`${nk(a)} ${DIV} 🔲 = ${nk(qv)}`; }
+      }
+      if(Number.isInteger(answer) && answer>=0 && answer<=999){
+        return {text, answer, decimals:0};
+      }
+    }
+    const a=randInt(1,20), b=randInt(1,20);
+    return {text:`🔲 ${PLUS} ${nk(b)} = ${nk(a+b)}`, answer:a, decimals:0};
+  }
+
+  function genAdvanced(level){
+    const subtype = randInt(0,2);
+    if(subtype===0){
+      const denomOptions=[3,4,5,6,8,10];
+      const d = denomOptions[randInt(0,denomOptions.length-1)];
+      const n1 = randInt(1,d-2);
+      const n2 = randInt(1, Math.max(1, d-1-n1));
+      const sumNum = n1+n2;
+      const g = gcd(sumNum,d);
+      const rn = sumNum/g, rd = d/g;
+      const text = `${nk(n1)}/${nk(d)} ${PLUS} ${nk(n2)}/${nk(d)} = ${Q}`;
+      return {text, type:'fraction', rawNum:rn, rawDen:rd};
+    } else if(subtype===1){
+      let a = randInt(10,99)/10;
+      let b = randInt(10,99)/10;
+      let isAdd = Math.random()<0.5;
+      if(!isAdd && b>a) isAdd = true;
+      let answer, text;
+      if(isAdd){
+        answer = +(a+b).toFixed(1);
+        text = `${nk(a.toFixed(1))} ${PLUS} ${nk(b.toFixed(1))} = ${Q}`;
+      } else {
+        answer = +(a-b).toFixed(1);
+        text = `${nk(a.toFixed(1))} ${MINUS} ${nk(b.toFixed(1))} = ${Q}`;
+      }
+      return {text, answer, decimals:1};
+    } else {
+      const root = randInt(2,15);
+      const sq = root*root;
+      const text = `√${nk(sq)} = ${Q}`;
+      return {text, answer: root, decimals:0};
+    }
+  }
+
+  function genPro(level){
+    const subtype = randInt(0,2);
+    if(subtype===0){
+      const power = Math.random()<0.7 ? 2 : 3;
+      const base = power===2 ? randInt(2,12) : randInt(2,6);
+      const answer = Math.pow(base,power);
+      const sup = power===2 ? '²' : '³';
+      const text = `${nk(base)}${sup} = ${Q}`;
+      const customDistractors = [Math.pow(base-1,power), Math.pow(base+1,power), base*power];
+      return {text, answer, decimals:0, customDistractors};
+    } else if(subtype===1){
+      for(let attempt=0; attempt<30; attempt++){
+        const a=randInt(1,15), b=randInt(1,15), c=randInt(1,15);
+        const ops=['+','-','×'];
+        const op1=ops[randInt(0,2)], op2=ops[randInt(0,2)];
+        const inner = op1==='+'?a+b:(op1==='-'?a-b:a*b);
+        if(inner<0) continue;
+        const val = op2==='+'?inner+c:(op2==='-'?inner-c:inner*c);
+        if(Number.isInteger(val) && val>=0 && val<=9999){
+          const s1 = op1==='×'?TIMES:(op1==='-'?MINUS:PLUS);
+          const s2 = op2==='×'?TIMES:(op2==='-'?MINUS:PLUS);
+          const text = `(${nk(a)} ${s1} ${nk(b)}) ${s2} ${nk(c)} = ${Q}`;
+          return {text, answer: val, decimals:0};
+        }
+      }
+      return {text:`(${nk(2)} ${PLUS} ${nk(3)}) ${TIMES} ${nk(2)} = ${Q}`, answer:10, decimals:0};
+    } else {
+      const a=randInt(2,10), unknown=randInt(1,10), b=randInt(1,20);
+      const c = unknown*a+b;
+      const text = `🔲 ${TIMES} ${nk(a)} ${PLUS} ${nk(b)} = ${nk(c)}`;
+      return {text, answer: unknown, decimals:0};
+    }
+  }
+
+  function generateQuestion(level){
+    if(level<=10) return genAddSub(level);
+    if(level<=20) return genMultDiv(level);
+    if(level<=30) return genMixed(level);
+    if(level<=40) return genMissing(level);
+    if(level<=50) return genAdvanced(level);
+    return genPro(level);
+  }
+
+  function bandName(level){
+    if(level<=10) return 'کۆکردنەوە و لێدەرکردن';
+    if(level<=20) return 'زەرب و دابەشکردن';
+    if(level<=30) return 'کارلێکی تێکەڵ (ڕیزبەندی کردار)';
+    if(level<=40) return 'دۆزینەوەی ژمارەی ون بوو';
+    if(level<=50) return 'کەسر، ژمارەی دەیی و ڕەگی دووجا';
+    return 'ئاستی پرۆ 🏅';
+  }
+
+  /* ============ DISTRACTOR GENERATION ============ */
+
+  function numericDistractors(answer, decimals, level){
+    const results = [];
+    const range = Math.max(3, Math.round(Math.abs(answer)*0.3)+2);
+    let guard=0;
+    while(results.length<8 && guard<80){
+      guard++;
+      const offsetBase = randInt(1, range);
+      const sign = Math.random()<0.5?-1:1;
+      let candidate = decimals>0
+        ? +(answer + offsetBase*sign*Math.pow(10,-decimals)).toFixed(decimals)
+        : answer + offsetBase*sign;
+      if(candidate<0) continue;
+      const key = decimals>0 ? candidate.toFixed(decimals) : String(candidate);
+      if(!results.includes(key)) results.push(key);
+    }
+    return results;
+  }
+
+  function fractionDistractors(num, den){
+    const results = [];
+    const correctKey = `${num}/${den}`;
+    let guard=0;
+    while(results.length<8 && guard<80){
+      guard++;
+      let dn = num + randInt(-2,2);
+      let dd = den;
+      if(Math.random()<0.3) dd = den + (Math.random()<0.5?1:-1);
+      if(dn<=0 || dd<=0) continue;
+      const g = gcd(dn,dd);
+      const key = `${dn/g}/${dd/g}`;
+      if(key!==correctKey && !results.includes(key)) results.push(key);
+    }
+    return results;
+  }
+
+  function displayKey(key){
+    const s = String(key);
+    if(s.includes('/')){
+      const [n,d] = s.split('/');
+      return `${nk(n)}${'/'}${nk(d)}`;
+    }
+    return nk(s);
+  }
+
+  function buildQuestion(level){
+    const q = generateQuestion(level);
+    let correctKey, choices;
+
+    if(q.type==='fraction'){
+      correctKey = `${q.rawNum}/${q.rawDen}`;
+      const set = new Set([correctKey]);
+      const more = fractionDistractors(q.rawNum, q.rawDen);
+      for(const m of more){ if(set.size>=4) break; set.add(m); }
+      choices = Array.from(set);
+      let guard=0;
+      while(choices.length<4 && guard<30){ guard++; choices.push(`${randInt(1,9)}/${randInt(2,10)}`); }
+      choices = Array.from(new Set(choices)).slice(0,4);
+    } else {
+      const decimals = q.decimals||0;
+      correctKey = decimals>0 ? Number(q.answer).toFixed(decimals) : String(Math.round(q.answer));
+      const set = new Set([correctKey]);
+      (q.customDistractors||[]).forEach(cd=>{
+        if(cd===undefined || cd===null) return;
+        const num = Number(cd);
+        if(!Number.isFinite(num) || num<0) return;
+        const k = decimals>0 ? num.toFixed(decimals) : String(Math.round(num));
+        if(k!==correctKey) set.add(k);
+      });
+      if(set.size<4){
+        const more = numericDistractors(q.answer, decimals, level);
+        for(const m of more){ if(set.size>=4) break; if(m!==correctKey) set.add(m); }
+      }
+      choices = Array.from(set);
+      let guard=0;
+      while(choices.length<4 && guard<50){
+        guard++;
+        const extra = decimals>0
+          ? (Number(correctKey)+ (guard*0.5+1)).toFixed(decimals)
+          : String(Number(correctKey)+guard+1);
+        if(!choices.includes(extra)) choices.push(extra);
+      }
+      choices = choices.slice(0,4);
+    }
+
+    return { text:q.text, correctKey, choices: shuffle(choices) };
+  }
+
+  /* ============ AUDIO ============ */
+  let audioCtx=null, soundOn=true;
+  function ensureAudio(){
+    if(!audioCtx){
+      try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+    }
+  }
+  function playTone(freq,duration,type='sine',vol=0.15){
+    if(!audioCtx) return;
     try{
-      const c = getCtx();
-      const o = c.createOscillator(); const g = c.createGain();
-      o.type = type; o.frequency.value = freq;
-      g.gain.value = vol;
-      o.connect(g); g.connect(c.destination);
-      const t0 = c.currentTime + delay;
-      g.gain.setValueAtTime(vol, t0);
-      g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
-      o.start(t0); o.stop(t0 + dur + 0.02);
-    }catch(e){/* audio not available */}
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type=type; osc.frequency.value=freq;
+      gain.gain.value=vol;
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+duration);
+      osc.stop(audioCtx.currentTime+duration+0.05);
+    }catch(e){}
   }
-  return {
-    correct(){ tone(523.25,.12,'sine',.2,0); tone(659.25,.12,'sine',.2,.09); tone(783.99,.18,'sine',.22,.18); },
-    wrong(){ tone(220,.18,'sawtooth',.15,0); tone(160,.22,'sawtooth',.15,.1); },
-    levelup(){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,.16,'triangle',.2,i*.11)); },
-    click(){ tone(880,.05,'sine',.08,0); }
-  };
+  function playCorrectSound(){ if(!soundOn) return; ensureAudio(); playTone(880,0.12); setTimeout(()=>playTone(1175,0.15),100); }
+  function playWrongSound(){ if(!soundOn) return; ensureAudio(); playTone(170,0.28,'sawtooth',0.12); }
+  function playLevelUpSound(){ if(!soundOn) return; ensureAudio(); playTone(660,0.1); setTimeout(()=>playTone(880,0.1),110); setTimeout(()=>playTone(1320,0.2),220); }
+
+  /* ============ GAME STATE ============ */
+  const STORAGE_KEY = 'kurdish_math_game_v1';
+  let state = { level:1, xp:0, score:0, streak:0, highscore:0 };
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        state = Object.assign(state, parsed);
+      }
+    }catch(e){}
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  function xpToNext(level){ return 100 + (level-1)*15; }
+
+  let currentQ = null;
+  let answering = false;
+
+  /* ============ DOM REFS ============ */
+  const screenStart = document.getElementById('screen-start');
+  const screenGame = document.getElementById('screen-game');
+  const startHighscoreEl = document.getElementById('start-highscore');
+  const startLevelEl = document.getElementById('start-level');
+  const startBtn = document.getElementById('start-btn');
+  const resetBtn = document.getElementById('reset-btn');
+  const homeBtn = document.getElementById('home-btn');
+  const soundToggle = document.getElementById('sound-toggle');
+
+  const hudLevel = document.getElementById('hud-level');
+  const hudXpText = document.getElementById('hud-xp-text');
+  const xpFill = document.getElementById('xp-fill');
+  const hudStreak = document.getElementById('hud-streak');
+  const hudScore = document.getElementById('hud-score');
+  const hudHigh = document.getElementById('hud-high');
+  const bandTag = document.getElementById('band-tag');
+
+  const questionTextEl = document.getElementById('question-text');
+  const gameCard = document.getElementById('game-card');
+  const choiceButtons = Array.from(document.querySelectorAll('.choice-btn'));
+  const feedbackLine = document.getElementById('feedback-line');
+  const confettiContainer = document.getElementById('confetti-container');
+  const levelupToast = document.getElementById('levelup-toast');
+  const levelupNum = document.getElementById('levelup-num');
+
+  /* ============ SCREEN SWITCH ============ */
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function refreshStartScreen(){
+    startHighscoreEl.textContent = nk(state.highscore);
+    startLevelEl.textContent = nk(state.level);
+  }
+
+  /* ============ HUD ============ */
+  function updateHUD(){
+    const need = xpToNext(state.level);
+    hudLevel.textContent = nk(state.level);
+    hudXpText.textContent = `${nk(state.xp)} / ${nk(need)}`;
+    xpFill.style.width = Math.min(100,(state.xp/need)*100) + '%';
+    hudStreak.textContent = nk(state.streak);
+    hudScore.textContent = nk(state.score);
+    hudHigh.textContent = nk(state.highscore);
+    bandTag.textContent = bandName(state.level);
+  }
+
+  /* ============ CONFETTI ============ */
+  function spawnConfetti(){
+    const colors = ['#ff595e','#ffca3a','#8ac926','#1982c4','#6a4c93','#ff9600'];
+    for(let i=0;i<28;i++){
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random()*100 + '%';
+      piece.style.background = colors[randInt(0,colors.length-1)];
+      piece.style.animationDuration = (Math.random()*1 + 1.1) + 's';
+      piece.style.animationDelay = (Math.random()*0.25) + 's';
+      piece.style.borderRadius = Math.random()<0.5 ? '50%' : '2px';
+      confettiContainer.appendChild(piece);
+      setTimeout(()=>piece.remove(), 2400);
+    }
+  }
+
+  function showLevelUpToast(level){
+    levelupNum.textContent = nk(level);
+    levelupToast.classList.add('show');
+    playLevelUpSound();
+    spawnConfetti();
+    setTimeout(()=>levelupToast.classList.remove('show'), 1900);
+  }
+
+  /* ============ QUESTION FLOW ============ */
+  function loadQuestion(){
+    currentQ = buildQuestion(state.level);
+    questionTextEl.textContent = currentQ.text;
+    feedbackLine.textContent = '\u00A0';
+    choiceButtons.forEach((btn, i)=>{
+      const key = currentQ.choices[i];
+      btn.dataset.key = key;
+      btn.textContent = displayKey(key);
+      btn.disabled = false;
+      btn.classList.remove('correct','wrong');
+    });
+    answering = false;
+  }
+
+  function clearChoiceClasses(){
+    choiceButtons.forEach(btn=>btn.classList.remove('correct','wrong'));
+    gameCard.classList.remove('shake');
+  }
+
+  function checkLevelUp(){
+    let need = xpToNext(state.level);
+    let leveled = false;
+    while(state.xp >= need){
+      state.xp -= need;
+      state.level++;
+      leveled = true;
+      need = xpToNext(state.level);
+    }
+    if(state.score > state.highscore) state.highscore = state.score;
+    if(leveled) showLevelUpToast(state.level);
+  }
+
+  function handleCorrect(){
+    playCorrectSound();
+    spawnConfetti();
+    feedbackLine.textContent = 'وەڵامی ڕاستە! 🎉';
+    feedbackLine.style.color = '#2fa300';
+    const gain = 10 + Math.min(state.streak,10)*2;
+    state.streak++;
+    state.xp += gain;
+    state.score += gain;
+    checkLevelUp();
+    updateHUD();
+    saveState();
+    setTimeout(()=>{ clearChoiceClasses(); loadQuestion(); }, 900);
+  }
+
+  function handleWrong(){
+    playWrongSound();
+    feedbackLine.textContent = `هەڵەیە! وەڵامی ڕاست: ${displayKey(currentQ.correctKey)}`;
+    feedbackLine.style.color = '#d63e3e';
+    state.streak = 0;
+    state.xp = Math.max(0, state.xp - 5);
+    if(state.score > state.highscore) state.highscore = state.score;
+    updateHUD();
+    saveState();
+    setTimeout(()=>{ clearChoiceClasses(); loadQuestion(); }, 1500);
+  }
+
+  function selectAnswer(btn){
+    if(answering) return;
+    answering = true;
+    choiceButtons.forEach(b=>b.disabled=true);
+    const key = btn.dataset.key;
+    if(key === currentQ.correctKey){
+      btn.classList.add('correct');
+      handleCorrect();
+    } else {
+      btn.classList.add('wrong');
+      choiceButtons.forEach(b=>{ if(b.dataset.key===currentQ.correctKey) b.classList.add('correct'); });
+      gameCard.classList.add('shake');
+      handleWrong();
+    }
+  }
+
+  choiceButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>selectAnswer(btn));
+  });
+
+  /* ============ NAV / SETUP ============ */
+  startBtn.addEventListener('click', ()=>{
+    ensureAudio();
+    showScreen('screen-game');
+    updateHUD();
+    loadQuestion();
+  });
+
+  resetBtn.addEventListener('click', ()=>{
+    if(confirm('دڵنیایت لە دەستپێکردنەوەی یاری لە سەرەتاوە؟')){
+      state = { level:1, xp:0, score:0, streak:0, highscore: state.highscore };
+      saveState();
+      refreshStartScreen();
+    }
+  });
+
+  homeBtn.addEventListener('click', ()=>{
+    if(state.score > state.highscore) state.highscore = state.score;
+    saveState();
+    refreshStartScreen();
+    showScreen('screen-start');
+  });
+
+  soundToggle.addEventListener('click', ()=>{
+    soundOn = !soundOn;
+    soundToggle.textContent = soundOn ? '🔊' : '🔇';
+    if(soundOn) ensureAudio();
+  });
+
+  /* ============ INIT ============ */
+  loadState();
+  refreshStartScreen();
+  showScreen('screen-start');
+
 })();
-
-function confettiBurst(n=60){
-  const colors = ['#FFC93C','#FF5D7A','#4CD37B','#57C2F5','#9B5DE5'];
-  for(let i=0;i<n;i++){
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.left = Math.random()*100 + 'vw';
-    el.style.background = pick(colors);
-    el.style.animationDuration = (2 + Math.random()*1.5) + 's';
-    el.style.transform = `rotate(${Math.random()*360}deg)`;
-    el.style.borderRadius = Math.random()>0.5 ? '50%' : '2px';
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(), 3600);
-  }
-}
-
-/* ---------------------------------------------------------------
-   1. QUESTION DATABASE
-   Each entry: { q: "...", o: [4 options], a: correctIndex, t: tier(1-5), e: emoji(optional) }
-   tier 1 -> levels 1-20 | tier 2 -> 21-40 | tier 3 -> 41-60 | tier 4 -> 61-80 | tier 5 -> 81-100+
-
-   ⬇️⬇️⬇️  PASTE YOUR THOUSANDS OF NEW QUESTIONS INSIDE THE MATCHING
-   ARRAY BELOW, FOLLOWING THE SAME {q,o,a,t,e} FORMAT.  ⬇️⬇️⬇️
-   --------------------------------------------------------------- */
-const QDB = {
-
-  /* ============================= ENGLISH ============================= */
-  english: [
-    // ---- tier 1 (levels 1-20): letters, colors, basic words ----
-    {q:'کامیان پیتی یەکەمی ئەلفوبێی ئینگلیزییە؟', o:['A','B','C','D'], a:0, t:1, e:'🔤'},
-    {q:'وشەی "Dog" واتای چیە؟', o:['پشیلە','سەگ','مانگا','مریشک'], a:1, t:1, e:'🐕'},
-    {q:'وشەی "Sun" واتای چیە؟', o:['مانگ','ئەستێرە','خۆر','هەور'], a:2, t:1, e:'☀️'},
-    {q:'ڕەنگی "Red" چیە؟', o:['شین','سور','سەوز','زەرد'], a:1, t:1, e:'🔴'},
-    {q:'وشەی "Water" واتای چیە؟', o:['ئاگر','ئاو','با','خۆڵ'], a:1, t:1, e:'💧'},
-    {q:'ژمارەی "Three" بە ژمارە چەندە؟', o:['١','٢','٣','٤'], a:2, t:1, e:'🔢'},
-    {q:'وشەی "Cat" واتای چیە؟', o:['پشیلە','سەگ','باڵندە','ماسی'], a:0, t:1, e:'🐈'},
-    {q:'وشەی "Book" واتای چیە؟', o:['قەڵەم','دەفتەر','کتێب','مێز'], a:2, t:1, e:'📖'},
-    {q:'"Hello" بە کوردی چیە؟', o:['بەخێربێیت','سڵاو','سوپاس','ماڵئاوایی'], a:1, t:1, e:'👋'},
-    {q:'ڕەنگی "Blue" چیە؟', o:['شین','سور','ڕەش','سپی'], a:0, t:1, e:'🔵'},
-    {q:'وشەی "Apple" واتای چیە؟', o:['پرتەقاڵ','سێو','مۆز','هەنار'], a:1, t:1, e:'🍎'},
-    {q:'"Mother" واتای چیە؟', o:['باوک','دایک','برا','خوشک'], a:1, t:1, e:'👩'},
-    {q:'ژمارەی "Ten" بە ژمارە چەندە؟', o:['٥','٨','١٠','١٢'], a:2, t:1, e:'🔟'},
-    {q:'وشەی "House" واتای چیە؟', o:['قوتابخانە','ماڵ','باخچە','شەقام'], a:1, t:1, e:'🏠'},
-
-    // ---- tier 2 (21-40): daily objects, animals, simple sentences ----
-    {q:'"I am happy" واتای چیە؟', o:['من دڵتەنگم','من دڵخۆشم','من ماندووم','من برسیم'], a:1, t:2, e:'😊'},
-    {q:'کامیان ناوی ڕۆژێکی هەفتەیە؟', o:['Monday','Table','Green','Happy'], a:0, t:2, e:'📅'},
-    {q:'"They are playing" مانای چیە؟', o:['ئەوان دەخوێنن','ئەوان یاری دەکەن','ئەوان دەخەون','ئەوان دەخۆن'], a:1, t:2, e:'⚽'},
-    {q:'کۆی مانگەکانی ساڵ بە ئینگلیزی چەندن؟', o:['١٠','١١','١٢','١٣'], a:2, t:2, e:'🗓️'},
-    {q:'"She is a teacher" واتای چیە؟', o:['ئەو پزیشکە','ئەو مامۆستایە','ئەو خوێندکارە','ئەو ئەندازیارە'], a:1, t:2, e:'👩‍🏫'},
-    {q:'شێوازی کۆی "Book" چیە؟', o:['Bookes','Books','Bookies','Bookss'], a:1, t:2, e:'📚'},
-    {q:'"Where do you live?" پرسیارەکە دەربارەی چیە؟', o:['تەمەن','ناو','شوێنی نیشتەجێبوون','کار'], a:2, t:2, e:'🏘️'},
-    {q:'کامیان لە ڕستەدا وشەی کار (verb) ـە؟ "He runs fast"', o:['He','runs','fast','.'], a:1, t:2, e:'🏃'},
-    {q:'"Yesterday" مانای چیە؟', o:['سبەی','ئەمڕۆ','دوێنێ','دواڕۆژ'], a:2, t:2, e:'🕰️'},
-    {q:'کۆی "Foot" چیە؟', o:['Foots','Feet','Footes','Feets'], a:1, t:2, e:'🦶'},
-    {q:'"I have two brothers" چەند برای هەیە؟', o:['١','٢','٣','٤'], a:1, t:2, e:'👬'},
-    {q:'کامیان وشەی هەست (feeling) ـە؟', o:['Table','Angry','Chair','Window'], a:1, t:2, e:'😠'},
-
-    // ---- tier 3 (41-60): grammar basics, tenses ----
-    {q:'شێوازی ڕاستی کاتی ڕابردوو بۆ "go" کامیانە؟', o:['goed','went','gone','going'], a:1, t:3, e:'⏮️'},
-    {q:'"I ___ to school every day" کامیان دروستە؟', o:['go','goes','going','went'], a:0, t:3, e:'🏫'},
-    {q:'کامیان جۆری ناو (noun) نییە؟', o:['Happiness','Quickly','Teacher','City'], a:1, t:3, e:'📘'},
-    {q:'شێوازی داهاتوو بۆ "will" لەم ڕستەیەدا "I ___ visit you" کامیانە؟', o:['will','am','was','did'], a:0, t:3, e:'🔮'},
-    {q:'کامیان کاردانگرە (adjective)؟', o:['Run','Beautiful','Quickly','House'], a:1, t:3, e:'🌸'},
-    {q:'"There ___ many books on the table" کامیان دروستە؟', o:['is','are','be','was'], a:1, t:3, e:'📚'},
-    {q:'"She doesn\'t like coffee" — ئەم ڕستەیە بە کام کاتە؟', o:['ڕابردوو','ئێستا','داهاتوو','ئارامانە'], a:1, t:3, e:'☕'},
-    {q:'کامیان کاردانگری بەراورد (comparative) ـە؟', o:['Big','Bigger','Biggest','Bigly'], a:1, t:3, e:'📏'},
-    {q:'کامیان ئاوازناوی کەسی یەکەمە (pronoun)؟', o:['He','I','It','They'], a:1, t:3, e:'🙋'},
-    {q:'"Can you help me?" مانای چیە؟', o:['دەتوانیت یارمەتیم بدەیت؟','یارمەتیت پێویستە؟','چۆنیت؟','کوا دەچیت؟'], a:0, t:3, e:'🤝'},
-
-    // ---- tier 4 (61-80): advanced grammar & vocabulary ----
-    {q:'کامیان شێوازی ڕاستی "Present Perfect" ـە؟', o:['I go','I went','I have gone','I am going'], a:2, t:4, e:'✍️'},
-    {q:'"Although it was raining, we went out" — واتای "although" چیە؟', o:['چونکە','هەرچەندە','دواتر','پێش ئەوەی'], a:1, t:4, e:'🌧️'},
-    {q:'کامیان دەستەواژەی هاوواتا (synonym) بۆ "Happy" ـە؟', o:['Sad','Joyful','Angry','Tired'], a:1, t:4, e:'😄'},
-    {q:'کامیان دژە واتا (antonym) بۆ "Difficult" ـە؟', o:['Hard','Easy','Complex','Tough'], a:1, t:4, e:'⚖️'},
-    {q:'"If I were you, I would study more" — ئەمە چ جۆرە ڕستەیەکە؟', o:['مەرجی ڕاستەقینە','مەرجی نائاسایی','ڕابردوو','داهاتوو'], a:1, t:4, e:'📝'},
-    {q:'کامیان وشەی ئاماژە بە کار (verb) لە شێوەی -ing دراوە؟', o:['Swimming','Swim','Swims','Swam'], a:0, t:4, e:'🏊'},
-    {q:'"Neither...nor" بەکاردێت بۆ؟', o:['هەڵبژاردنی دوانی','نەخشاندنی هەردووکیان بە نەرێنی','بەراوردکردن','کاتی داهاتوو'], a:1, t:4, e:'🚫'},
-    {q:'کامیان وشەی ڕادەبەخش (adverb) ـە؟', o:['Slow','Slowly','Slowness','Slowed'], a:1, t:4, e:'🐢'},
-
-    // ---- tier 5 (81-100+): fluency, idioms, complex sentences ----
-    {q:'"Break the ice" واتای چیە؟', o:['شکاندنی بەستەڵەک','دەستپێکردنی گفتوگۆ بە ئاسانی','بەهێزی سەرما','کارێکی سەخت'], a:1, t:5, e:'🧊'},
-    {q:'کامیان شێوازی Passive Voice ـە؟', o:['The cat chased the mouse','The mouse was chased by the cat','The cat is chasing','Chasing the mouse'], a:1, t:5, e:'🐭'},
-    {q:'"Piece of cake" بە مانای چیە؟', o:['پارچەیەک کێک','کارێکی زۆر ئاسان','شتێکی بەتام','یارمەتیدان'], a:1, t:5, e:'🍰'},
-    {q:'کامیان دروستە بۆ Reported Speech؟ "She said, \'I am tired\'"', o:['She said she is tired','She said she was tired','She said I am tired','She says she was tired'], a:1, t:5, e:'💬'},
-    {q:'"Once in a blue moon" واتای چیە؟', o:['هەموو شەوێک','زۆر بەدەگمەن','لە شەوی مانگ','بەخێرایی'], a:1, t:5, e:'🌙'},
-    {q:'کامیان Conditional جۆری سێیەمە؟', o:['If it rains, I stay home','If I had studied, I would have passed','If I study, I pass','If I studied, I would pass'], a:1, t:5, e:'📖'},
-  ],
-
-  /* ============================= KURDISH ============================= */
-  kurdish: [
-    // tier 1
-    {q:'پێچەوانەی "گەورە" چیە؟', o:['بچووک','بەرز','درێژ','فراوان'], a:0, t:1, e:'🔠'},
-    {q:'پێچەوانەی "ڕۆژ" چیە؟', o:['خۆر','شەو','مانگ','ئەستێرە'], a:1, t:1, e:'🌙'},
-    {q:'کامیان ناوی ڕەنگە؟', o:['خواردن','زەرد','ڕۆیشتن','گەورە'], a:1, t:1, e:'🎨'},
-    {q:'پێچەوانەی "گەرم" چیە؟', o:['سارد','تەڕ','وشک','تاریک'], a:0, t:1, e:'❄️'},
-    {q:'کامیان ناوی ئاژەڵێکە؟', o:['خواردن','پشیلە','خواردنەوە','خەوتن'], a:1, t:1, e:'🐱'},
-    {q:'پێچەوانەی "زۆر" چیە؟', o:['کەم','گەورە','بچووک','درێژ'], a:0, t:1, e:'➖'},
-    {q:'پێچەوانەی "سوپا" (ڕوون) چیە؟', o:['تاریک','ڕووناک','گەرم','سارد'], a:0, t:1, e:'💡'},
-    {q:'کامیان ناوی میوەیەکە؟', o:['مێز','هەنار','دەرگا','پەنجەرە'], a:1, t:1, e:'🍎'},
-    {q:'پێچەوانەی "خۆشحاڵ" چیە؟', o:['دڵتەنگ','بەختەوەر','دڵخۆش','ئارام'], a:0, t:1, e:'😢'},
-    {q:'کامیان ناوی ڕۆژێکی هەفتەیە؟', o:['هەتاو','دووشەممە','بەفر','باران'], a:1, t:1, e:'📅'},
-
-    // tier 2 — synonyms/spelling
-    {q:'هاوواتای "خۆشحاڵ" چیە؟', o:['دڵتەنگ','دڵخۆش','بێزار','ترسناک'], a:1, t:2, e:'😊'},
-    {q:'هاوواتای "زیرەک" چیە؟', o:['گەڕۆک','تێبگەیشتوو','گەورە','بچووک'], a:1, t:2, e:'🧠'},
-    {q:'کام وشەیە بە دروستی نووسراوە؟', o:['خوێندکاار','خوێندکار','خویندکار','خوێندگار'], a:1, t:2, e:'✍️'},
-    {q:'هاوواتای "بەهێز" چیە؟', o:['لاواز','توانادار','نەخۆش','بچووک'], a:1, t:2, e:'💪'},
-    {q:'کام وشەیە بە دروستی نووسراوە؟', o:['مامۆستا','مامۆسا','مامۆستاا','ماموستا'], a:0, t:2, e:'👩‍🏫'},
-    {q:'هاوواتای "جوان" چیە؟', o:['ناشیرین','ڕازاوە','ترسناک','ناڕێک'], a:1, t:2, e:'🌸'},
-    {q:'دژە واتای "دروست" چیە؟', o:['هەڵە','ڕاست','باش','تەواو'], a:0, t:2, e:'❌'},
-    {q:'هاوواتای "خێرا" چیە؟', o:['هێواش','بەلەز','گران','دوور'], a:1, t:2, e:'⚡'},
-
-    // tier 3 — grammar
-    {q:'"من دەچمە قوتابخانە" — ئەم ڕستەیە بە کام کاتە؟', o:['ڕابردوو','ئێستا/داهاتوو','مەرجی','فەرمانی'], a:1, t:3, e:'🏫'},
-    {q:'کامیان ناوە (noun)؟', o:['ڕۆیشتن','کتێب','خۆشحاڵ','خێرا'], a:1, t:3, e:'📘'},
-    {q:'کامیان کارە (verb)؟', o:['خانوو','خواردن','گەورە','سوور'], a:1, t:3, e:'🏃'},
-    {q:'"ئەوان چوونە دەرەوە" — ناوگۆڕەکە (pronoun) کامەیە؟', o:['ئەوان','چوونە','دەرەوە','بۆ'], a:0, t:3, e:'👥'},
-    {q:'کۆی "کتێب" چیە؟', o:['کتێبەکان','کتێبان','کتێبی','کتێبەوە'], a:0, t:3, e:'📚'},
-    {q:'کامیان ڕستەی پرسیارییە؟', o:['من دەچم بۆ باخچە.','ئایا تۆ دەچیت بۆ باخچە؟','باخچەکە جوانە.','ئەو لە باخچەیە.'], a:1, t:3, e:'❓'},
-    {q:'"مامۆستا وانەکە ڕوون دەکاتەوە" — کارەکە کامیانە؟', o:['مامۆستا','وانەکە','ڕوون دەکاتەوە','کامیان'], a:2, t:3, e:'👩‍🏫'},
-
-    // tier 4 — deeper grammar & literature
-    {q:'کام لەمانە داب و نەریتی کوردییە؟', o:['نەورۆز','هالووین','کریسمس','ساڵی نوێی زایینی'], a:0, t:4, e:'🔥'},
-    {q:'کام ئامرازی پەیوەندیدەر (conjunction) ـە؟', o:['کتێب','و','خواردن','گەورە'], a:1, t:4, e:'🔗'},
-    {q:'"ناوی تایبەت" (Proper noun) کامیانە؟', o:['کوردستان','شار','خانوو','منداڵ'], a:0, t:4, e:'🏔️'},
-    {q:'کام لەمانە ڕستەی هاوکارە (compound sentence)؟', o:['من خواردم.','من خواردم و پاشان خەوتم.','خواردن باشە.','ئەو خواردنی خۆشدەوێت.'], a:1, t:4, e:'🔄'},
-    {q:'کام شاعیرێکی کوردە؟', o:['نالی','شکسپیر','حافز','فردەوسی'], a:0, t:4, e:'✒️'},
-
-    // tier 5 — advanced / culture
-    {q:'پایتەختی هەرێمی کوردستان چیە؟', o:['هەولێر','سلێمانی','دهۆک','کەرکووک'], a:0, t:5, e:'🏛️'},
-    {q:'جەژنی نەورۆز نیشانەی چیە؟', o:['کۆتایی زستان','سەرکەوتنی کاوە لە دژی زوهاک','دەستپێکی هاوین','جەژنی ڕەزبەری'], a:1, t:5, e:'🔥'},
-    {q:'کام ڕووداوێکی مێژووییە بۆ گەلی کورد؟', o:['شەڕی حەڵەبجە','شەڕی جیهانی یەکەم','شۆڕشی فەڕەنسا','دامەزراندنی ڕۆما'], a:0, t:5, e:'🕊️'},
-    {q:'زمانی کوردی سەر بە کام خێزانی زمانانەیە؟', o:['زمانە سامییەکان','زمانە هیندوئەورووپییەکان','زمانە تورکییەکان','زمانە چینییەکان'], a:1, t:5, e:'🌍'},
-  ],
-
-  /* ============================= SCIENCE ============================= */
-  science: [
-    // tier 1 — body parts, simple nature
-    {q:'ئێمە بە کام ئەندام دەبینین؟', o:['گوێ','چاو','لووت','دەم'], a:1, t:1, e:'👁️'},
-    {q:'ئێمە بە کام ئەندام دەبیستین؟', o:['چاو','گوێ','دەست','پێ'], a:1, t:1, e:'👂'},
-    {q:'دڵ لە کام بەشی جەستەیە؟', o:['سەر','سنگ','پێ','دەست'], a:1, t:1, e:'❤️'},
-    {q:'کام ئاژەڵە دەفڕێت؟', o:['ماسی','باڵندە','پشیلە','سەگ'], a:1, t:1, e:'🐦'},
-    {q:'کام ئاژەڵە لە ئاودا دەژی؟', o:['ماسی','شێر','ئەسپ','مریشک'], a:0, t:1, e:'🐟'},
-    {q:'ڕووەک بۆ گەشەکردن پێویستی بە چیە؟', o:['تەنها تاریکی','ئاو و ڕووناکی خۆر','ئاسن','بەتاری'], a:1, t:1, e:'🌱'},
-    {q:'دەم بۆ چی بەکاردێت؟', o:['بینین','خواردن و قسەکردن','بیستن','بۆنکردن'], a:1, t:1, e:'👄'},
-    {q:'کام یەکە پارچەیەکی گیانلەبەرە؟', o:['بەردی','پشیلە','مێز','کتێب'], a:1, t:1, e:'🐈'},
-
-    // tier 2 — nature & basic physics
-    {q:'ئاو لە چ پلەیەکدا دەبێتە جەمەد؟', o:['١٠٠ پلە','٠ پلە','٥٠ پلە','-١٠ پلە'], a:1, t:2, e:'🧊'},
-    {q:'ڕووناکی لە کوێوە دێت؟', o:['مانگ','خۆر','ئەستێرە','هەور'], a:1, t:2, e:'☀️'},
-    {q:'کام لەمانە کانزایە؟', o:['ئاسن','دار','کاغەز','لاستیک'], a:0, t:2, e:'⚙️'},
-    {q:'هەوا پێکهاتووە لە...', o:['تەنها ئۆکسجین','تێکەڵەیەک لە گازەکان','تەنها ئاو','تەنها کاربۆن'], a:1, t:2, e:'💨'},
-    {q:'کام وەرزە سارترینە؟', o:['هاوین','بەهار','زستان','پاییز'], a:2, t:2, e:'❄️'},
-    {q:'باران چۆن پێکدێت؟', o:['لە بەفر','لە هەڵمی ئاو لە هەوردا','لە خۆردا','لە زەویدا'], a:1, t:2, e:'🌧️'},
-    {q:'کام ئەندامی جەستە خوێن بڵاودەکاتەوە؟', o:['دڵ','جگەر','گورچیلە','مێشک'], a:0, t:2, e:'❤️'},
-
-    // tier 3 — space & human body deeper
-    {q:'گەورەترین گەرەستە لە خۆرسیستەمدا کامەیە؟', o:['زەوی','مریخ','هەورەتاش (Jupiter)','عوتارد'], a:2, t:3, e:'🪐'},
-    {q:'زەوی لە چەند کاتژمێردا خولێک لەدەوری خۆیدا دەسووڕێتەوە؟', o:['١٢','٢٤','٤٨','١'], a:1, t:3, e:'🌍'},
-    {q:'زیاترین بەشی جەستەی مرۆڤ پێکهاتووە لە...', o:['هەستی','ئاو','ئاسن','هەوا'], a:1, t:3, e:'💧'},
-    {q:'کام ئەندام هەناسە هەڵدەمژێت؟', o:['سیAccording','گورچیلە','دڵ','مێشک'], a:0, t:3, e:'🫁'},
-    {q:'مانگ لە دەوری چی دەسووڕێتەوە؟', o:['خۆر','زەوی','مریخ','ئەستێرە'], a:1, t:3, e:'🌙'},
-    {q:'کام ئامێر بۆ بینینی شتی زۆر بچووک بەکاردێت؟', o:['تیلیسکۆپ','مایکرۆسکۆپ','کامێرا','ڕادار'], a:1, t:3, e:'🔬'},
-
-    // tier 4 — physics basics
-    {q:'یاسای جاذبیەت کێ دۆزیەوە؟', o:['ئایینشتاین','نیوتن','گالیلیۆ','ئەدیسۆن'], a:1, t:4, e:'🍎'},
-    {q:'ڕووناکی بە چ خێرایێک دەڕوات؟', o:['خێراترین شت لە گیتیدا','هێواش وەک ئاو','وەک با','هەمیشە یەکسانە لەگەڵ دەنگ'], a:0, t:4, e:'💡'},
-    {q:'کام شت وریایی (energy) بۆ کارکردنی مۆتۆر پێویستە؟', o:['ئاو تەنها','وریایی/سووتەمەنی','هەوا تەنها','ڕووناکی تەنها'], a:1, t:4, e:'⚡'},
-    {q:'کام حاڵەتی مادەیە؟ (بەخاری)', o:['تەنها ڕەق','ڕەق، شل، گاز','تەنها گاز','تەنها شل'], a:1, t:4, e:'💨'},
-    {q:'کام کەرەستە کارەبا تێدەپەڕێنێت؟', o:['لاستیک','مس (ئاسنی سوور)','دار','کاغەز'], a:1, t:4, e:'🔌'},
-
-    // tier 5 — advanced
-    {q:'DNA بۆ چی بەکاردێت لە جەستەدا؟', o:['هەڵگرتنی زانیاری جینەکی','ژیر کردن','هەناسەدان','خواردن'], a:0, t:5, e:'🧬'},
-    {q:'کام ئاسمانە بۆتانی سووری ناسراوە؟', o:['زهرە','مریخ','عوتارد','هەورەتاش'], a:1, t:5, e:'🔴'},
-    {q:'فۆتۆسینتێز پرۆسەیەکە کە...', o:['ئاژەڵەکان دەیکەن','ڕووەکەکان خۆراک لە ڕووناکی دروستدەکەن','بەردەکان دروست دەبن','ئاو دەبێتە یەخ'], a:1, t:5, e:'🌿'},
-    {q:'یەکەی پێوانەی وزە چیە؟', o:['مەتر','جوول','کیلۆگرام','ساتیگرات'], a:1, t:5, e:'⚡'},
-  ],
-
-  /* ============================= RELIGION ============================= */
-  religion: [
-    // tier 1
-    {q:'ناوی پێغەمبەری ئیسلام چیە؟', o:['عیسا','موسا','محەمەد (ﷺ)','ئیبراهیم'], a:2, t:1, e:'☪️'},
-    {q:'کتێبی پیرۆزی موسڵمانان چ ناودەبرێت؟', o:['ئینجیل','قورئان','تەورات','زەبوور'], a:1, t:1, e:'📖'},
-    {q:'موسڵمانان بەرەو کوێ نوێژ دەکەن؟', o:['قودس','مەکە','مەدینە','بەغدا'], a:1, t:1, e:'🕋'},
-    {q:'چەند جار موسڵمان لە ڕۆژێکدا نوێژ دەکات؟', o:['٣','٤','٥','٦'], a:2, t:1, e:'🕌'},
-    {q:'مانگی ڕۆژووگرتن چ ناودەبرێت؟', o:['ڕەمەزان','شەوال','موحەڕەم','ڕەجەب'], a:0, t:1, e:'🌙'},
-    {q:'خودا بە کوردی چۆن ناودەبرێت لە ئیسلامدا؟', o:['خودا/ئەڵڵا','خاوەن','میر','شا'], a:0, t:1, e:'☪️'},
-
-    // tier 2
-    {q:'چەند ستوونی ئیسلام هەیە؟', o:['٣','٤','٥','٦'], a:2, t:2, e:'🕋'},
-    {q:'یەکەم ستوونی ئیسلام چیە؟', o:['نوێژ','شەهادەت','زەکات','حەج'], a:1, t:2, e:'🕋'},
-    {q:'حەج بۆ کوێ دەکرێت؟', o:['مەدینە','مەکە','قودس','ئیستەنبوڵ'], a:1, t:2, e:'🕋'},
-    {q:'زەکات چیە؟', o:['نوێژێکی تایبەت','بەخشینی بەشێک لەماڵ بە هەژاران','ڕۆژووگرتن','گەشتی مەکە'], a:1, t:2, e:'🤲'},
-    {q:'یەکەم ڕۆژی هەفتە بۆ موسڵمانان بۆ کۆبوونەوەی نوێژی هەینی کامەیە؟', o:['شەممە','هەینی','یەکشەممە','چوارشەممە'], a:1, t:2, e:'🕌'},
-    {q:'کام فریشتەیە کە وەحی بۆ پێغەمبەران دەهێنا؟', o:['میکائیل','جبرائیل','ئیسرافیل','عەزرائیل'], a:1, t:2, e:'👼'},
-
-    // tier 3
-    {q:'قورئان لە چەند سورەت پێکهاتووە؟', o:['١٠٠','١١٤','١٢٠','٩٩'], a:1, t:3, e:'📖'},
-    {q:'یەکەم سورەتی قورئان کامەیە؟', o:['سورەتی بەقەرە','سورەتی فاتیحە','سورەتی یاسین','سورەتی ئیخلاس'], a:1, t:3, e:'📖'},
-    {q:'کام پێغەمبەر بەناوی "کەشتی" ناسراوە؟', o:['موسا','نوح','ئیبراهیم','یوسف'], a:1, t:3, e:'🚢'},
-    {q:'ڕۆژووی ڕەمەزان لە کام کات دەست پێدەکات؟', o:['لە خۆرهەڵاتنەوە','لە بەیانی زوو (فەجر)','لە نیوەڕۆ','لە ئێوارە'], a:1, t:3, e:'🌅'},
-    {q:'کام لەمانە خواردنی نایابی جەژنە؟', o:['ڕۆژووگرتن تەنها','خواردن و بەخشین بۆ هەژاران','نوێژی تەنها','هیچکام'], a:1, t:3, e:'🎉'},
-    {q:'شادایی و خۆشی جەژنی ڕەمەزان چ ناودەبرێت؟', o:['جەژنی ڕەمەزان (فیتر)','جەژنی قوربان','نەورۆز','جەژنی نوێژ'], a:0, t:3, e:'🎊'},
-
-    // tier 4
-    {q:'کام پێغەمبەر خودا پێی وت "کوڕی خۆت سەربڕە" وەک تاقیکردنەوە؟', o:['موسا','ئیبراهیم','یوسف','داود'], a:1, t:4, e:'🐑'},
-    {q:'کام پێغەمبەر توانای گفتوگۆکردنی لەگەڵ باڵندەکان هەبوو؟', o:['سلێمان','یونس','ئایوب','یەعقوب'], a:0, t:4, e:'🦅'},
-    {q:'مزگەوتی هەرەپیرۆز لای موسڵمانان لە کوێیە؟', o:['ئیستەنبوڵ','مەکە (مزگەوتی حەرام)','قاهیرە','بەغدا'], a:1, t:4, e:'🕋'},
-    {q:'شەوی قەدر لە کام مانگدایە؟', o:['شەوال','ڕەمەزان','موحەڕەم','زوڵحیجە'], a:1, t:4, e:'🌙'},
-    {q:'کام لەمانە لە ڕەوشتی چاکدا دەگونجێت؟', o:['درۆکردن','ڕاستگۆیی','خیانەت','دوژمنایەتی'], a:1, t:4, e:'💛'},
-
-    // tier 5
-    {q:'قورئان بۆ ماوەی چەند ساڵ دابەزی؟', o:['٢٣ ساڵ','١٠ ساڵ','٥ ساڵ','٣٠ ساڵ'], a:0, t:5, e:'📜'},
-    {q:'کام شار یەکەم قیبلەی موسڵمانان بوو پێش مەکە؟', o:['مەدینە','قودس','بەغدا','دیمەشق'], a:1, t:5, e:'🕌'},
-    {q:'ناوی هاوسەری یەکەمی پێغەمبەر (ﷺ) چیە؟', o:['عائیشە','خەدیجە','فاتیمە','زەینەب'], a:1, t:5, e:'🌸'},
-    {q:'کام خەلیفە یەکەم خەلیفەی موسڵمانان بوو دوای پێغەمبەر (ﷺ)؟', o:['عومەر','ئەبووبەکر','عوسمان','عەلی'], a:1, t:5, e:'☪️'},
-  ],
-};
-
-/* ---------------------------------------------------------------
-   2. MATH ENGINE — procedural generation (millions of variants)
-   tier scales automatically with the player's level, not hardcoded.
-   --------------------------------------------------------------- */
-function generateMathQuestion(level){
-  const tier = Math.min(5, Math.ceil(level/20)); // 1..5
-  let a,b,op,answer,text;
-
-  function distractors(correct, spread){
-    const set = new Set([correct]);
-    while(set.size < 4){
-      const d = correct + randInt(-spread, spread);
-      if(d !== correct && d >= 0 && !set.has(d)) set.add(d);
-    }
-    return shuffle([...set]);
-  }
-
-  if(tier === 1){ // single digit +/-
-    a = randInt(1,10); b = randInt(1,10);
-    op = pick(['+','-']);
-    if(op === '-' && b > a) [a,b] = [b,a];
-    answer = op === '+' ? a+b : a-b;
-    text = `${toEastern(a)} ${op} ${toEastern(b)} = ؟`;
-    return {q:text, o:distractors(answer,4).map(toEastern), a:0, correct:answer, opRaw:distractors(answer,4)};
-  }
-  if(tier === 2){ // up to 20, intro multiplication tables 1-5
-    op = pick(['+','-','×']);
-    if(op === '×'){ a = randInt(1,5); b = randInt(1,5); answer = a*b; }
-    else { a = randInt(5,20); b = randInt(1,20); if(op==='-' && b>a) [a,b]=[b,a]; answer = op==='+'? a+b : a-b; }
-    text = `${toEastern(a)} ${op} ${toEastern(b)} = ؟`;
-    const opts = distractors(answer, 5);
-    return {q:text, o:opts.map(toEastern), correct:answer};
-  }
-  if(tier === 3){ // multiplication tables up to 10, simple division
-    op = pick(['×','÷']);
-    if(op === '×'){ a = randInt(2,10); b = randInt(2,10); answer = a*b; text = `${toEastern(a)} × ${toEastern(b)} = ؟`; }
-    else { b = randInt(2,10); answer = randInt(2,10); a = b*answer; text = `${toEastern(a)} ÷ ${toEastern(b)} = ؟`; }
-    const opts = distractors(answer, 6);
-    return {q:text, o:opts.map(toEastern), correct:answer};
-  }
-  if(tier === 4){ // two/three-digit operations
-    op = pick(['+','-','×']);
-    if(op === '×'){ a = randInt(10,25); b = randInt(2,9); answer = a*b; }
-    else { a = randInt(50,300); b = randInt(10,200); if(op==='-' && b>a) [a,b]=[b,a]; answer = op==='+'? a+b : a-b; }
-    text = `${toEastern(a)} ${op} ${toEastern(b)} = ؟`;
-    const opts = distractors(answer, 10);
-    return {q:text, o:opts.map(toEastern), correct:answer};
-  }
-  // tier 5: percentages, fractions, simple algebra
-  const kind = pick(['percent','fraction','algebra']);
-  if(kind === 'percent'){
-    const base = pick([10,20,25,50,100,200,400]);
-    const pct = pick([10,20,25,50]);
-    answer = base * pct/100;
-    text = `${toEastern(pct)}% لە ${toEastern(base)} دەکاتە چەند؟`;
-    const opts = distractors(answer, Math.max(4, Math.round(answer*0.4)));
-    return {q:text, o:opts.map(toEastern), correct:answer};
-  }
-  if(kind === 'fraction'){
-    const denom = pick([2,4,5,10]);
-    const whole = randInt(1,5)*denom;
-    answer = whole/denom;
-    text = `١/${toEastern(denom)} لە ${toEastern(whole)} دەکاتە چەند؟`;
-    const opts = distractors(answer, 4);
-    return {q:text, o:opts.map(toEastern), correct:answer};
-  }
-  // simple algebra: x + a = b
-  a = randInt(2,20); const x = randInt(1,20); b = a + x;
-  answer = x;
-  text = `ئەگەر x + ${toEastern(a)} = ${toEastern(b)}, ئەوا x = ؟`;
-  const opts = distractors(answer, 5);
-  return {q:text, o:opts.map(toEastern), correct:answer};
-}
-
-function buildMathOption(level){
-  const raw = generateMathQuestion(level);
-  const correctVal = raw.correct;
-  const optsNum = raw.o.map(s => {
-    // convert back eastern->western for index matching safety
-    let w = s; EASTERN_DIGITS.forEach((ed,i)=>{ w = w.split(ed).join(i); });
-    return parseInt(w,10);
-  });
-  const correctIndex = optsNum.findIndex(n => n === correctVal);
-  return { q: raw.q, o: raw.o, a: correctIndex, t: Math.min(5, Math.ceil(level/20)), e:'🔢' };
-}
-
-/* ---------------------------------------------------------------
-   3. STATE (in-memory only — this file is viewed inside Claude's
-   sandboxed artifact preview, which does not support localStorage.
-   If you host this file on your own server/browser, you can safely
-   wrap PlayerState load/save with localStorage.getItem/setItem.)
-   --------------------------------------------------------------- */
-const PlayerState = {
-  level: 1,
-  xp: 0,
-  gems: 0,
-  streak: 0,
-  bestStreak: 0,
-  usedPools: {}, // { "english-1": [remaining shuffled indices] }
-};
-
-function xpNeededFor(level){ return 80 + (level-1)*15; }
-
-/* Session (current quiz run) */
-let Session = {
-  category: null,
-  queue: [],       // array of question objects for this run
-  index: 0,
-  correctCount: 0,
-  xpEarned: 0,
-  lives: 3,
-  answered: false,
-};
-
-/* ---------------------------------------------------------------
-   4. NO-REPEAT QUESTION POOL LOGIC
-   --------------------------------------------------------------- */
-function tierForLevel(level){ return Math.min(5, Math.ceil(level/20)); }
-
-function getPoolKey(cat, tier){ return `${cat}-${tier}`; }
-
-function drawQuestions(cat, count){
-  const tier = tierForLevel(PlayerState.level);
-  const results = [];
-
-  if(cat === 'math'){
-    for(let i=0;i<count;i++) results.push(buildMathOption(PlayerState.level));
-    return results;
-  }
-
-  if(cat === 'mixed'){
-    const cats = ['english','kurdish','science','religion','math'];
-    for(let i=0;i<count;i++){
-      const c = pick(cats);
-      if(c === 'math'){ results.push(buildMathOption(PlayerState.level)); }
-      else { results.push(drawFromPool(c, tier, 1)[0]); }
-    }
-    return results;
-  }
-
-  return drawFromPool(cat, tier, count);
-}
-
-function drawFromPool(cat, tier, count){
-  const pool = QDB[cat].filter(q => q.t === tier);
-  const key = getPoolKey(cat, tier);
-  if(!PlayerState.usedPools[key] || PlayerState.usedPools[key].length === 0){
-    PlayerState.usedPools[key] = shuffle(pool.map((_,i)=>i));
-  }
-  const out = [];
-  for(let i=0;i<count;i++){
-    if(PlayerState.usedPools[key].length === 0){
-      PlayerState.usedPools[key] = shuffle(pool.map((_,i)=>i));
-    }
-    const idx = PlayerState.usedPools[key].pop();
-    out.push(pool[idx]);
-  }
-  return out;
-}
-
-/* ---------------------------------------------------------------
-   5. UI RENDERING
-   --------------------------------------------------------------- */
-const CAT_LABELS = {
-  english:'ئینگلیزی', math:'بیرکاری', kurdish:'زمانی کوردی', science:'زانست', religion:'ئایینی', mixed:'تێکەڵ'
-};
-const QUESTIONS_PER_ROUND = 8;
-
-function el(id){ return document.getElementById(id); }
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  el(id).classList.add('active');
-}
-
-function refreshHomeUI(){
-  el('home-level').textContent = toEastern(PlayerState.level);
-  el('home-xp').textContent = toEastern(PlayerState.xp);
-  const need = xpNeededFor(PlayerState.level);
-  el('home-xp-need').textContent = toEastern(need);
-  el('home-xp-fill').style.width = Math.min(100,(PlayerState.xp/need)*100) + '%';
-  el('home-gems').textContent = toEastern(PlayerState.gems);
-  el('home-streak').textContent = toEastern(PlayerState.streak);
-  el('home-streak-pill').classList.toggle('hot', PlayerState.streak >= 3);
-
-  ['english','kurdish','science','religion'].forEach(cat=>{
-    const tier = tierForLevel(PlayerState.level);
-    const total = QDB[cat].filter(q=>q.t===tier).length;
-    el('prog-'+cat).textContent = `پۆلی ${toEastern(tier)} • ${toEastern(total)} پرسیار`;
-  });
-}
-
-function startCategory(cat){
-  AudioFX.click();
-  Session = { category:cat, queue:drawQuestions(cat, QUESTIONS_PER_ROUND), index:0, correctCount:0, xpEarned:0, lives:3, answered:false };
-  el('quiz-cat-tag').textContent = CAT_LABELS[cat] + ' • ' + 'ئاست ' + toEastern(PlayerState.level);
-  renderHearts();
-  showScreen('screen-quiz');
-  renderQuestion();
-}
-
-function renderHearts(){
-  el('quiz-hearts').textContent = '❤️'.repeat(Session.lives) + '🖤'.repeat(3-Session.lives);
-}
-
-function renderQuestion(){
-  Session.answered = false;
-  const q = Session.queue[Session.index];
-  el('quiz-progress-fill').style.width = ((Session.index)/Session.queue.length*100) + '%';
-  el('quiz-emoji').textContent = q.e || '';
-  el('quiz-question').textContent = q.q;
-  el('quiz-next').style.display = 'none';
-  el('quiz-feedback').classList.remove('show');
-
-  const optWrap = el('quiz-options');
-  optWrap.innerHTML = '';
-  const letters = ['أ','ب','ج','د'];
-  q.o.forEach((optText, i)=>{
-    const btn = document.createElement('button');
-    btn.className = 'option-btn';
-    btn.innerHTML = `<span>${optText}</span><span class="opt-letter">${letters[i]}</span>`;
-    btn.addEventListener('click', ()=> handleAnswer(i, btn, q));
-    optWrap.appendChild(btn);
-  });
-}
-
-function handleAnswer(chosenIndex, btnEl, q){
-  if(Session.answered) return;
-  Session.answered = true;
-  const correct = chosenIndex === q.a;
-  const allBtns = document.querySelectorAll('#quiz-options .option-btn');
-  allBtns.forEach(b => b.classList.add('disabled'));
-
-  if(correct){
-    btnEl.classList.add('correct');
-    AudioFX.correct();
-    Session.correctCount++;
-    PlayerState.streak++;
-    PlayerState.bestStreak = Math.max(PlayerState.bestStreak, PlayerState.streak);
-    const gained = 10 + Math.min(15, PlayerState.streak*2);
-    Session.xpEarned += gained;
-    PlayerState.gems += 1;
-    showFeedback(true, `+${toEastern(gained)} XP`);
-  } else {
-    btnEl.classList.add('wrong');
-    allBtns[q.a].classList.add('correct');
-    AudioFX.wrong();
-    document.querySelector('.question-card').classList.add('shake');
-    setTimeout(()=>document.querySelector('.question-card').classList.remove('shake'), 450);
-    PlayerState.streak = 0;
-    Session.lives--;
-    renderHearts();
-    showFeedback(false, 'وەڵامی ڕاست دیاریکراوە بە سەوز');
-  }
-  refreshHomeUI();
-  el('quiz-next').style.display = 'block';
-  el('quiz-next').textContent = (Session.lives <= 0) ? 'بینینی ئەنجام' : (Session.index+1 >= Session.queue.length ? 'کۆتایی هێنان' : 'بەردەوامبوون');
-}
-
-function showFeedback(good, sub){
-  const bar = el('quiz-feedback');
-  bar.className = 'feedback-bar show ' + (good ? 'good' : 'bad');
-  el('feedback-emoji').textContent = good ? pick(['🎉','⭐','🔥','👏']) : '💡';
-  el('feedback-title').textContent = good ? pick(['وەڵامی ڕاست!','گەورەیت!','زۆر باشە!','ئاماژەت ڕاستە!']) : 'هیچی خراپ نییە، دووبارە هەوڵبدەوە!';
-  el('feedback-sub').textContent = sub;
-}
-
-function nextQuestion(){
-  AudioFX.click();
-  if(Session.lives <= 0 || Session.index+1 >= Session.queue.length){
-    finishSession();
-    return;
-  }
-  Session.index++;
-  renderQuestion();
-}
-
-function finishSession(){
-  // apply XP & handle level ups
-  let leveledUp = false;
-  let newLevel = PlayerState.level;
-  PlayerState.xp += Session.xpEarned;
-  while(PlayerState.xp >= xpNeededFor(newLevel)){
-    PlayerState.xp -= xpNeededFor(newLevel);
-    newLevel++;
-    leveledUp = true;
-  }
-  PlayerState.level = newLevel;
-  refreshHomeUI();
-
-  const pct = Session.queue.length ? Math.round(Session.correctCount/Session.queue.length*100) : 0;
-  el('complete-emoji').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '🎉' : '💪';
-  el('complete-title').textContent = pct >= 80 ? 'ئەستێرەی ڕاستەقینەیت!' : pct >= 50 ? 'کارێکی باشت کرد!' : 'بەردەوام بە هەوڵبدە!';
-  el('complete-sub').textContent = `تۆ ${toEastern(Session.correctCount)} لە ${toEastern(Session.queue.length)} پرسیارت وەڵام دایەوە بە ڕاستی.`;
-  el('complete-correct').textContent = toEastern(Session.correctCount);
-  el('complete-xp').textContent = toEastern(Session.xpEarned);
-  el('complete-streak').textContent = toEastern(PlayerState.bestStreak);
-
-  showScreen('screen-home');
-  el('modal-complete').classList.add('show');
-
-  if(leveledUp){
-    setTimeout(()=>{
-      el('modal-complete').classList.remove('show');
-      el('levelup-num').textContent = toEastern(PlayerState.level);
-      el('modal-levelup').classList.add('show');
-      AudioFX.levelup();
-      confettiBurst(70);
-    }, 350);
-  } else if(pct >= 80){
-    confettiBurst(40);
-  }
-}
-
-/* ---------------------------------------------------------------
-   6. EVENT WIRING
-   --------------------------------------------------------------- */
-document.querySelectorAll('.cat-card').forEach(card=>{
-  card.addEventListener('click', ()=> startCategory(card.dataset.cat));
-});
-el('quiz-back').addEventListener('click', ()=>{ AudioFX.click(); showScreen('screen-home'); refreshHomeUI(); });
-el('quiz-next').addEventListener('click', nextQuestion);
-el('levelup-close').addEventListener('click', ()=>{ el('modal-levelup').classList.remove('show'); });
-el('complete-close').addEventListener('click', ()=>{ el('modal-complete').classList.remove('show'); });
-
-/* init */
-refreshHomeUI();
 </script>
 </body>
 </html>
